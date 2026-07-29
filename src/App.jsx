@@ -5,8 +5,8 @@ import Nav from './index_component/Nav';
 import Footer from './index_component/Footer';
 
 function App() {
-  // bg-white 不能省：nav 的 mix-blend-difference 需要有實際繪製的背景才會混色，
-  // 沒設背景的區域（瀏覽器畫布預設色）不參與混色，白字會直接消失
+  // bg-white 是全站底色。Nav 顏色改由 data-navcolor 自適應偵測（見 Nav.jsx），
+  // 深色區塊（Banner、Footer）掛 data-navcolor="white"，其餘預設深色字。
   return (
     <div className="relative w-full space-y-[120px] bg-white">
       <ScrollRestoration /> {/* 解決捲軸問題 */}

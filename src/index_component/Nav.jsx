@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import logo from "../assets/icons/logo.svg";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 // 桌機導覽項目（手機側邊選單另有一份，標籤不同：Articles 顯示為 News）
 const NAV_ITEMS = [
@@ -24,6 +24,40 @@ export default function Nav() {
 	const [visible, setVisible] = useState(true);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const lastScrollY = useRef(0);
+
+	// Nav 顏色：black = 深色字（用於淺色背景）、white = 白字（用於深色背景/照片）
+	// 取代原本的 mix-blend-difference —— 那會在中灰背景上讓 logo 消失。
+	// 深色區塊（Banner、Footer）掛 data-navcolor="white"，其餘預設用深色字。
+	const [navColor, setNavColor] = useState("black");
+	const location = useLocation();
+
+	// 偵測 Nav 位置（距頂約 45px）正下方是哪個區塊，據此決定深色字或白字。
+	// 深色區塊（Banner、Footer）掛 data-navcolor="white"；進入偵測線就切白字。
+	useEffect(() => {
+		const probeY = 45; // Nav 上 logo / 文字大約的垂直位置
+		const measure = () => {
+			let color = "black";
+			document.querySelectorAll("[data-navcolor]").forEach((el) => {
+				const r = el.getBoundingClientRect();
+				if (r.top <= probeY && r.bottom >= probeY) {
+					color = el.getAttribute("data-navcolor");
+				}
+			});
+			setNavColor(color);
+		};
+		measure();
+		window.addEventListener("scroll", measure, { passive: true });
+		window.addEventListener("resize", measure);
+		return () => {
+			window.removeEventListener("scroll", measure);
+			window.removeEventListener("resize", measure);
+		};
+	}, [location.pathname]);
+
+	const isWhite = navColor === "white";
+	// 用 inline style 直接上色，避免 Tailwind class 在此情境被 @utility 顏色蓋掉
+	const navInk = isWhite ? "#ffffff" : "#303030";
+	const inkTransition = "color var(--motion-base) var(--motion-ease-standard)";
 
 	/*
 	  Project 下拉選單：
@@ -113,7 +147,6 @@ export default function Nav() {
 			<nav
 				className={`
                     fixed top-0 left-0 right-0 py-[4.5vh]
-                    mix-blend-difference
                     transition-transform duration-[var(--motion-base)] ease-[var(--motion-ease-spring)]
                     ${visible ? "translate-y-0" : "-translate-y-full"}
                     z-50
@@ -129,7 +162,14 @@ export default function Nav() {
 								}`}
 						>
 							<img
-								className="w-[150px] h-auto lg:w-[250px] brightness-0 invert"
+								className="w-[150px] h-auto lg:w-[250px]"
+								style={{
+									filter: isWhite
+										? "brightness(0) invert(1)"
+										: "brightness(0) invert(0)",
+									transition:
+										"filter var(--motion-base) var(--motion-ease-standard)",
+								}}
 								src={logo}
 								alt="tsio_design_plan logo"
 							/>
@@ -139,7 +179,12 @@ export default function Nav() {
 							onClick={toggleMenu}
 							aria-label="導覽列開關"
 							// 按鈕的 z-index 保持在 z-60，或是不設定 (因為父層 nav 已經是 z-50 最高了)
-							className={`lg:hidden z-60 relative text-white`}
+							// 選單開啟時面板是深色，維持白色；否則跟著 navColor 走
+							className="lg:hidden z-60 relative"
+							style={{
+								color: menuOpen || isWhite ? "#ffffff" : "#303030",
+								transition: inkTransition,
+							}}
 						>
 							<div className="w-6 h-6 flex flex-col justify-center items-center">
 								<span
@@ -158,7 +203,10 @@ export default function Nav() {
 						</button>
 
 						{/* ... Desktop ul ... */}
-						<ul className="hidden lg:flex space-x-[60px] bodyText-large-bold-web ">
+						<ul
+							className="hidden lg:flex space-x-[60px] bodyText-large-bold-web"
+							style={{ color: navInk, transition: inkTransition }}
+						>
 							{NAV_ITEMS.map(({ to, label }) => {
 								// Project：無底線、帶加號（開啟時轉成減號）、hover 展開下拉選單
 								if (to === "/Plan") {
@@ -171,7 +219,7 @@ export default function Nav() {
 										>
 											<NavLink
 												to={to}
-												className="flex items-center gap-[10px] text-white"
+												className="flex items-center gap-[10px]"
 											>
 												{label}
 												{/* 加號 → 減號：整個圖示轉 90 度（中途呈斜線），
@@ -190,7 +238,7 @@ export default function Nav() {
 								}
 								return (
 									<li key={to}>
-										<NavLink to={to} className="nav-underline text-white">
+										<NavLink to={to} className="nav-underline">
 											{label}
 										</NavLink>
 									</li>

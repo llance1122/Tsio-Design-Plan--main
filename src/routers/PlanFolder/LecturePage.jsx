@@ -102,7 +102,7 @@ export default function LecturePage() {
                 />
               </div>
               <p className="bodyText lg:bodyText-web text-center mt-[var(--title-gap-text)]">講座免費參加，部分座位可預約，名額有限。點擊報名連結或現場候補入場。</p>
-              <button class="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block mt-[30px]">
+              <button className="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block mt-[30px]">
                 立即報名 Register Now
               </button>
             </div>

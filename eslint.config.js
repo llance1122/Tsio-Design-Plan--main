@@ -26,4 +26,15 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  {
+    // Node 環境：後端與建置設定檔（使用 process / Buffer 等 Node 全域）
+    files: ['server/**/*.js', 'vite.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      // Express 錯誤處理中介層需保留 next 參數；忽略未使用的函式參數
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_|^next$', varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
 ])

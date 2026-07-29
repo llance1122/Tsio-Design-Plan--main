@@ -121,7 +121,7 @@ export default function Banner() {
 	}, [advanceLeft, advanceRight, advanceMobile, advanceTablet]);
 
 	return (
-		<section className="relative h-screen w-full">
+		<section className="relative h-screen w-full" data-navcolor="white">
 			{/* 頂部漸層暗角：把照片上緣稍微壓暗，
 			    讓 nav 的 mix-blend-difference 在中間調（接近 50% 灰）的圖上也拉得開反差 */}
 			<div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[22vh] bg-linear-to-b from-black/10 to-transparent" />

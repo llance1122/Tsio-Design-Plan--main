@@ -41,18 +41,21 @@ export default function Footer() {
 					TO TOP
 				</p>
 			</button>
-			<footer className="w-full pt-[40px] pb-[20px] lg:pt-[80px] lg:pb-[40px] lg:px-[40px] bg-black">
+			<footer
+				className="w-full pt-[40px] pb-[20px] lg:pt-[80px] lg:pb-[40px] lg:px-[40px] bg-black"
+				data-navcolor="white"
+			>
 				{/* 主要內容容器 */}
 				<div className="flex flex-col items-center gap-[70px] lg:max-w-7xl lg:mx-auto lg:grid lg:grid-cols-4 lg:gap-8 lg:items-start">
 					{/* Logo 和聯絡資訊 */}
 					<div className="w-auto h-[250px] flex flex-col justify-between items-center lg:col-span-2 lg:h-auto lg:items-start lg:justify-start lg:gap-[50px]">
-						<a href="/" aria-label="返回首頁">
+						<Link to="/" aria-label="返回首頁">
 							<img
 								className="w-[140px] h-auto lg:w-[160px]"
 								src={logoFooter}
 								alt="tsio_design_plan logo"
 							/>
-						</a>
+						</Link>
 						<div className="w-[300px] h-[130px] flex flex-col justify-between lg:w-auto lg:h-auto lg:gap-2 lg:mt-4">
 							<ContactInfoItem
 								Icon={IconClock}
@@ -84,13 +87,13 @@ export default function Footer() {
 							</h3>
 							<ul className="footer flex flex-row justify-between text-secondary lg:flex-col lg:justify-start lg:space-y-[15px] lg:bodyText-web lg:text-secondary">
 								<li>
-									<Link to="About">關於我們</Link>
+									<Link to="/About">關於我們</Link>
 								</li>
 								<li>
-									<Link to="Contact">聯絡我們</Link>
+									<Link to="/Contact">聯絡我們</Link>
 								</li>
 								<li>
-									<Link to="News">最新消息</Link>
+									<Link to="/Articles">最新消息</Link>
 								</li>
 							</ul>
 						</div>
@@ -100,19 +103,19 @@ export default function Footer() {
 							</h3>
 							<ul className="footer flex flex-row justify-between text-secondary lg:flex-col lg:justify-start lg:space-y-[15px] lg:bodyText-web lg:text-secondary">
 								<li>
-									<Link to="Plan/Market">市集</Link>
+									<Link to="/Plan/Market">市集</Link>
 								</li>
 								<li>
-									<Link to="Plan/Workshop">工作坊</Link>
+									<Link to="/Plan/Workshop">工作坊</Link>
 								</li>
 								<li>
-									<Link to="Plan/Exhibition">展覽</Link>
+									<Link to="/Plan/ExhibitionList">展覽</Link>
 								</li>
 								<li>
-									<Link to="Plan/Lecture">演講</Link>
+									<Link to="/Plan/Lecture">演講</Link>
 								</li>
 								<li>
-									<Link to="Plan/Other">其他活動</Link>
+									<Link to="/Plan/Other">其他活動</Link>
 								</li>
 							</ul>
 						</div>

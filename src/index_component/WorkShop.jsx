@@ -9,7 +9,7 @@ export default function WorkShop() {
 		<section className="flex flex-col items-center">
 			<Title titleEN="workshop" title="工作坊" />
 			<div className="w-full flex space-x-[18%] mt-[var(--title-gap)]">
-				<div className="w-[43%] h-[200px] flex items-end sel md:h-[400px] lg:h-[800px]">
+				<div className="w-[43%] h-[200px] flex items-end md:h-[400px] lg:h-[800px]">
 					<div className="w-full">
 						<img
 							className="h-full w-full object-cover headline"

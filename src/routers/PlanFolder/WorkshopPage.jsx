@@ -42,11 +42,12 @@ export default function WorkshopPage() {
         </div>
 
         <div className="max-w-[82.2vw] mx-auto space-y-[30px]">
-          <button class="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block">
-            <Link to="/Plan/Workshop/List">
-              View More
-            </Link>
-          </button>
+          <Link
+            to="/Plan/Workshop/List"
+            className="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block w-fit"
+          >
+            View More
+          </Link>
         </div>
       </main>
     </section>
