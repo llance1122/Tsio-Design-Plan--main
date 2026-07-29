@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 代修正的事項.txt
+
+# backend (server)
+.env
+server/.env
+server/data.db
+server/data.db-*
+server/uploads/*
+!server/uploads/.gitkeep
