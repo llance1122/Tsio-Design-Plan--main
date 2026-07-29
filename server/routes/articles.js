@@ -34,22 +34,6 @@ const upload = multer({
 	},
 });
 
-// 由標題產生唯一 slug；重複時自動加序號
-function uniqueSlug(title) {
-	const base =
-		String(title)
-			.trim()
-			.toLowerCase()
-			.replace(/[^\w一-鿿]+/g, "-")
-			.replace(/^-+|-+$/g, "")
-			.slice(0, 40) || "article";
-	const exists = db.prepare("SELECT 1 FROM articles WHERE slug = ?");
-	let slug = base;
-	let i = 1;
-	while (exists.get(slug)) slug = `${base}-${i++}`;
-	return slug;
-}
-
 // 只保留合法的內文區塊（subtitle / paragraph + 字串內容）
 function sanitizeBlocks(raw) {
 	let arr;
@@ -101,18 +85,22 @@ router.post("/", requireAuth, upload.single("cover"), (req, res) => {
 	}
 
 	const cover = req.file ? `/uploads/${req.file.filename}` : null;
-	const slug = uniqueSlug(title);
 
+	// 先用暫時的唯一 slug 插入，取得自動編號 id 後，改成乾淨短代碼 a-{id}
+	// （中文標題直接當 slug 會變成一長串編碼過的網址，故改用短代碼）
+	const tempSlug = `tmp-${crypto.randomBytes(8).toString("hex")}`;
 	const info = db
 		.prepare(
 			`INSERT INTO articles (slug, title, description, date, location, cover, blocks)
 			 VALUES (?, ?, ?, ?, ?, ?, ?)`
 		)
-		.run(slug, title.trim(), description, date, location, cover, JSON.stringify(blocks));
+		.run(tempSlug, title.trim(), description, date, location, cover, JSON.stringify(blocks));
 
-	const created = db
-		.prepare("SELECT * FROM articles WHERE id = ?")
-		.get(info.lastInsertRowid);
+	const id = Number(info.lastInsertRowid);
+	const slug = `a-${id}`;
+	db.prepare("UPDATE articles SET slug = ? WHERE id = ?").run(slug, id);
+
+	const created = db.prepare("SELECT * FROM articles WHERE id = ?").get(id);
 	created.blocks = JSON.parse(created.blocks);
 	res.status(201).json(created);
 });
