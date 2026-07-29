@@ -8,7 +8,8 @@ process.env.BROWSER = 'msedge'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/Tsio_Design',
+  // 部署到 NAS 由 Express 從網域根目錄服務，故用 '/'
+  base: '/',
   server: {
     host: true,
     // 開發時把 API 與上傳圖片的請求轉給後端（server/index.js，預設 3001 埠）

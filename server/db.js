@@ -2,8 +2,13 @@
 //  資料庫層：使用 Node 24 內建的 SQLite（node:sqlite）
 //  免安裝、免編譯原生模組，Windows 與 Docker(Linux) 皆通用
 // ============================================================
+import fs from "node:fs";
+import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { DB_PATH } from "./config.js";
+
+// 確保資料庫所在目錄存在（Docker 掛載 volume 時尤其重要）
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new DatabaseSync(DB_PATH);
 

@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+.claude
+data
+server/.env
+server/data.db
+server/data.db-*
+server/uploads
+*.log
+README.md
+代修正的事項.txt

@@ -1,0 +1,20 @@
+# ============================================================
+#  Synology Container Manager「專案」用的 compose 設定
+#  部署前務必修改 ADMIN_PASSWORD 與 JWT_SECRET
+# ============================================================
+services:
+  tsio:
+    build: .
+    container_name: tsio-design
+    ports:
+      # 左邊是 NAS 對外的埠（可自行改），右邊 3001 是容器內的埠（勿改）
+      - "8080:3001"
+    volumes:
+      # 把 NAS 上的 ./data 資料夾掛進容器，保存資料庫與上傳圖片
+      - ./data:/data
+    environment:
+      - DATA_DIR=/data
+      # ↓↓↓ 上線前一定要改這兩個 ↓↓↓
+      - ADMIN_PASSWORD=請改成你的後台密碼
+      - JWT_SECRET=請改成一長串隨機字元
+    restart: unless-stopped

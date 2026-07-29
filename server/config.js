@@ -24,6 +24,10 @@ export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin1234";
 export const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-please-change";
 
 // 資料與檔案路徑
-export const DB_PATH = path.join(__dirname, "data.db");
-export const UPLOAD_DIR = path.join(__dirname, "uploads");
+// DATA_DIR：資料庫與上傳圖片的存放目錄。
+//  - 本機開發：預設 server/ 目錄
+//  - Docker 部署：設成掛載的 volume（如 /data），讓資料在重建容器後保留
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+export const DB_PATH = path.join(DATA_DIR, "data.db");
+export const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
 export const DIST_DIR = path.join(__dirname, "..", "dist");

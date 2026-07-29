@@ -11,6 +11,13 @@ import db from "./db.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsonPath = path.join(__dirname, "..", "src", "data", "article.json");
 
+// 已有文章就完全略過（保護正式環境使用者在後台的新增／編輯／刪除不被覆蓋）
+const already = db.prepare("SELECT COUNT(*) AS n FROM articles").get().n;
+if (already > 0) {
+	console.log(`資料庫已有 ${already} 篇文章，略過匯入。`);
+	process.exit(0);
+}
+
 const articles = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
 
 const insert = db.prepare(

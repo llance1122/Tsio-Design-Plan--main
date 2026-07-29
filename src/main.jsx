@@ -112,7 +112,7 @@ const router = createBrowserRouter(
 		},
 	],
 	{
-		basename: "/Tsio_Design",
+		basename: "/",
 	}
 );
 
