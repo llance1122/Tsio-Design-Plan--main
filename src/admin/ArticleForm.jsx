@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createArticle, updateArticle } from "./api";
+import { url } from "../lib/paths";
 
 const EMPTY = { title: "", description: "", date: "", location: "" };
 
@@ -147,7 +148,7 @@ export default function ArticleForm({ editing, onDone, onCancel }) {
 				{isEditing && editing.cover && (
 					<div className="flex items-center gap-3">
 						<img
-							src={editing.cover}
+							src={url(editing.cover)}
 							alt="目前海報"
 							className="w-24 h-16 object-cover rounded border border-neutral-200"
 						/>

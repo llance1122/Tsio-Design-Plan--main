@@ -4,6 +4,7 @@ import CardLayout from "../small_component/CardLayout";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
+import { url } from "../lib/paths";
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -60,7 +61,7 @@ export default function Article() {
 
 	useEffect(() => {
 		// API 已依建立時間新→舊排序，取前三筆即為最新文章
-		fetch("/api/articles")
+		fetch(url("/api/articles"))
 			.then((r) => r.json())
 			.then((data) => setLatestArticles(data.slice(0, 3)))
 			.catch(() => setLatestArticles([]));

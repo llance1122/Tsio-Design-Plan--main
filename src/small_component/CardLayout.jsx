@@ -5,6 +5,7 @@ import {
 	exhibitionImages,
 } from "../data/imagesObjects";
 import defaultCover from "../assets/imgs/default-cover.jpg";
+import { url } from "../lib/paths";
 
 // 決定卡片點擊後前往的路由
 function getCardLink(item) {
@@ -21,9 +22,9 @@ function getCardLink(item) {
 
 // 決定卡片封面圖
 function getCardImage(item) {
-	// 後端文章：直接用上傳的海報網址；沒有海報就用預設圖
+	// 後端文章：用上傳的海報網址（接上 base）；沒有海報就用預設圖
 	// （用 "cover" in item 判斷「這是 API 文章」，即使值為 null）
-	if (item.cover) return item.cover;
+	if (item.cover) return url(item.cover);
 	if ("cover" in item) return defaultCover;
 
 	// 本地 JSON：用 image key 去對照表找圖

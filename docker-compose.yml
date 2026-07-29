@@ -14,6 +14,8 @@ services:
       - ./data:/data
     environment:
       - DATA_DIR=/data
+      # 網站掛的子路徑，必須與打包時 vite base 一致（見 vite.config.js）
+      - BASE_PATH=/tsio-design
       # ↓↓↓ 上線前一定要改這兩個 ↓↓↓
       - ADMIN_PASSWORD=請改成你的後台密碼
       - JWT_SECRET=請改成一長串隨機字元

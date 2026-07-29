@@ -17,6 +17,11 @@ try {
 
 export const PORT = Number(process.env.PORT) || 3001;
 
+// 子路徑前綴：整個網站掛在此路徑下（如 "/tsio-design"）。
+// 必須與前端 vite.config 的 base 一致。留空 = 掛在網域根目錄。
+// 去除結尾斜線，統一成 "" 或 "/xxx" 形式。
+export const BASE_PATH = (process.env.BASE_PATH || "").replace(/\/+$/, "");
+
 // 後台登入密碼：正式環境務必在 .env 覆寫
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin1234";
 

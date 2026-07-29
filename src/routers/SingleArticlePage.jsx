@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { url } from "../lib/paths";
 // 沒上傳海報時的預設圖：與文章列表卡片用同一張，避免「列表一張、內頁另一張」的錯覺
 import defaultHero from "../assets/imgs/default-cover.jpg";
 
@@ -10,7 +11,7 @@ export default function SingleArticlePage() {
 
 	useEffect(() => {
 		setStatus("loading");
-		fetch(`/api/articles/${articleId}`)
+		fetch(url(`/api/articles/${articleId}`))
 			.then((r) => {
 				if (r.status === 404) throw new Error("notfound");
 				if (!r.ok) throw new Error("error");
@@ -37,8 +38,8 @@ export default function SingleArticlePage() {
 		);
 	}
 
-	// 主圖：優先用上傳的海報，沒有則用預設圖
-	const hero = article.cover || defaultHero;
+	// 主圖：優先用上傳的海報（接上 base），沒有則用預設圖
+	const hero = article.cover ? url(article.cover) : defaultHero;
 
 	return (
 		<section className="w-full mx-auto md:px-[40px] lg:max-w-7xl xl:px-0 mt-[15vh] lg:mt-[24vh]">

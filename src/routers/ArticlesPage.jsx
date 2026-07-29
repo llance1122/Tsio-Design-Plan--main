@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import CardLayout from "../small_component/CardLayout";
+import { url } from "../lib/paths";
 
 export default function ArticlesPage() {
 	const [articles, setArticles] = useState([]);
 	const [status, setStatus] = useState("loading"); // loading | error | ok
 
 	useEffect(() => {
-		fetch("/api/articles")
+		fetch(url("/api/articles"))
 			.then((r) => {
 				if (!r.ok) throw new Error("讀取失敗");
 				return r.json();
