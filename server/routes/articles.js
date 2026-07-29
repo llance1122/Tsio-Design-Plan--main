@@ -105,6 +105,55 @@ router.post("/", requireAuth, upload.single("cover"), (req, res) => {
 	res.status(201).json(created);
 });
 
+// ---- 更新（需登入）----
+// 不改動 slug（保留原網址）；有上傳新海報才換圖，否則沿用原本的
+router.put("/:id", requireAuth, upload.single("cover"), (req, res) => {
+	const existing = db
+		.prepare("SELECT * FROM articles WHERE id = ?")
+		.get(req.params.id);
+	if (!existing) return res.status(404).json({ error: "找不到文章" });
+
+	const { title, description = "", date = "", location = "" } = req.body;
+	if (!title || !title.trim()) {
+		return res.status(400).json({ error: "缺少文章標題" });
+	}
+
+	const blocks = sanitizeBlocks(req.body.blocks);
+	if (blocks === null) {
+		return res.status(400).json({ error: "內文（blocks）格式錯誤" });
+	}
+
+	// 有上傳新海報 → 換圖並刪掉舊檔；沒有 → 保留原 cover
+	let cover = existing.cover;
+	if (req.file) {
+		cover = `/uploads/${req.file.filename}`;
+		if (existing.cover && existing.cover.startsWith("/uploads/")) {
+			const oldFile = path.join(UPLOAD_DIR, path.basename(existing.cover));
+			fs.rm(oldFile, { force: true }, () => {});
+		}
+	}
+
+	db.prepare(
+		`UPDATE articles
+		 SET title = ?, description = ?, date = ?, location = ?, cover = ?, blocks = ?
+		 WHERE id = ?`
+	).run(
+		title.trim(),
+		description,
+		date,
+		location,
+		cover,
+		JSON.stringify(blocks),
+		req.params.id
+	);
+
+	const updated = db
+		.prepare("SELECT * FROM articles WHERE id = ?")
+		.get(req.params.id);
+	updated.blocks = JSON.parse(updated.blocks);
+	res.json(updated);
+});
+
 // ---- 刪除（需登入）----
 router.delete("/:id", requireAuth, (req, res) => {
 	const row = db.prepare("SELECT cover FROM articles WHERE id = ?").get(req.params.id);

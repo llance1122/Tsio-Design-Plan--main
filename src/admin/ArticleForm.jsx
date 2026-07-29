@@ -1,14 +1,36 @@
-import { useState } from "react";
-import { createArticle } from "./api";
+import { useState, useEffect } from "react";
+import { createArticle, updateArticle } from "./api";
 
 const EMPTY = { title: "", description: "", date: "", location: "" };
 
-export default function ArticleForm({ onCreated }) {
+export default function ArticleForm({ editing, onDone, onCancel }) {
 	const [fields, setFields] = useState(EMPTY);
 	const [blocks, setBlocks] = useState([]);
 	const [cover, setCover] = useState(null);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState("");
+
+	const isEditing = !!editing;
+
+	// 切換到編輯 / 新增時，重設表單內容
+	useEffect(() => {
+		if (editing) {
+			setFields({
+				title: editing.title || "",
+				description: editing.description || "",
+				date: editing.date || "",
+				location: editing.location || "",
+			});
+			setBlocks(
+				(editing.blocks || []).map((b) => ({ type: b.type, content: b.content }))
+			);
+		} else {
+			setFields(EMPTY);
+			setBlocks([]);
+		}
+		setCover(null);
+		setError("");
+	}, [editing]);
 
 	const setField = (k, v) => setFields((f) => ({ ...f, [k]: v }));
 
@@ -43,13 +65,18 @@ export default function ArticleForm({ onCreated }) {
 			fd.append("location", fields.location);
 			fd.append("blocks", JSON.stringify(clean));
 			if (cover) fd.append("cover", cover);
-			await createArticle(fd);
-			// 清空表單
-			setFields(EMPTY);
-			setBlocks([]);
-			setCover(null);
-			e.target.reset();
-			onCreated?.();
+
+			if (isEditing) {
+				await updateArticle(editing.id, fd);
+			} else {
+				await createArticle(fd);
+				// 新增後清空表單
+				setFields(EMPTY);
+				setBlocks([]);
+				setCover(null);
+				e.target.reset();
+			}
+			onDone?.(isEditing);
 		} catch (err) {
 			setError(err.message);
 		} finally {
@@ -59,7 +86,20 @@ export default function ArticleForm({ onCreated }) {
 
 	return (
 		<form onSubmit={submit} className="bg-white rounded-xl shadow p-6 space-y-5">
-			<h2 className="font-semibold text-lg">發布新文章</h2>
+			<div className="flex items-center justify-between">
+				<h2 className="font-semibold text-lg">
+					{isEditing ? `編輯文章：${editing.title}` : "發布新文章"}
+				</h2>
+				{isEditing && (
+					<button
+						type="button"
+						onClick={onCancel}
+						className="text-sm text-neutral-500 hover:text-neutral-800"
+					>
+						取消編輯
+					</button>
+				)}
+			</div>
 
 			<label className="block space-y-1">
 				<span className="text-sm text-neutral-600">標題 *</span>
@@ -101,15 +141,28 @@ export default function ArticleForm({ onCreated }) {
 				</label>
 			</div>
 
-			<label className="block space-y-1">
+			<div className="space-y-2">
 				<span className="text-sm text-neutral-600">海報圖</span>
+				{/* 編輯時顯示目前海報，讓使用者知道不換就會保留 */}
+				{isEditing && editing.cover && (
+					<div className="flex items-center gap-3">
+						<img
+							src={editing.cover}
+							alt="目前海報"
+							className="w-24 h-16 object-cover rounded border border-neutral-200"
+						/>
+						<span className="text-xs text-neutral-400">
+							目前的海報，不選新檔就會保留
+						</span>
+					</div>
+				)}
 				<input
 					type="file"
 					accept="image/*"
 					onChange={(e) => setCover(e.target.files[0] || null)}
 					className="w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-neutral-800 file:text-white file:px-3 file:py-1.5"
 				/>
-			</label>
+			</div>
 
 			{/* ---- 內文區塊編輯器 ---- */}
 			<div className="space-y-3">
@@ -192,12 +245,29 @@ export default function ArticleForm({ onCreated }) {
 
 			{error && <p className="text-red-600 text-sm">{error}</p>}
 
-			<button
-				disabled={busy}
-				className="bg-neutral-800 text-white rounded-lg px-6 py-2 hover:bg-neutral-700 disabled:opacity-50"
-			>
-				{busy ? "發布中…" : "發布文章"}
-			</button>
+			<div className="flex items-center gap-3">
+				<button
+					disabled={busy}
+					className="bg-neutral-800 text-white rounded-lg px-6 py-2 hover:bg-neutral-700 disabled:opacity-50"
+				>
+					{busy
+						? isEditing
+							? "更新中…"
+							: "發布中…"
+						: isEditing
+							? "更新文章"
+							: "發布文章"}
+				</button>
+				{isEditing && (
+					<button
+						type="button"
+						onClick={onCancel}
+						className="text-sm text-neutral-500 hover:text-neutral-800"
+					>
+						取消
+					</button>
+				)}
+			</div>
 		</form>
 	);
 }

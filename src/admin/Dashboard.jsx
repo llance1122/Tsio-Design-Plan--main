@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { fetchArticles, deleteArticle } from "./api";
+import { fetchArticles, fetchArticle, deleteArticle } from "./api";
 import ArticleForm from "./ArticleForm";
 
 export default function Dashboard({ onLogout }) {
 	const [articles, setArticles] = useState([]);
+	const [editing, setEditing] = useState(null); // 正在編輯的文章（含 blocks），null = 新增模式
 	const [msg, setMsg] = useState("");
 
 	const load = useCallback(async () => {
@@ -18,15 +19,35 @@ export default function Dashboard({ onLogout }) {
 		load();
 	}, [load]);
 
+	const startEdit = async (a) => {
+		setMsg("");
+		try {
+			// 列表項目不含內文，需另外抓完整資料帶入表單
+			const full = await fetchArticle(a.slug);
+			setEditing(full);
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		} catch (e) {
+			setMsg(e.message);
+		}
+	};
+
 	const handleDelete = async (a) => {
 		if (!window.confirm(`確定刪除「${a.title}」？此動作無法復原。`)) return;
 		try {
 			await deleteArticle(a.id);
+			// 若刪的正好是編輯中的文章，退回新增模式
+			if (editing && editing.id === a.id) setEditing(null);
 			setMsg("已刪除");
 			load();
 		} catch (e) {
 			setMsg(e.message);
 		}
+	};
+
+	const handleDone = (wasEditing) => {
+		setMsg(wasEditing ? "已更新！" : "發布成功！");
+		setEditing(null);
+		load();
 	};
 
 	return (
@@ -43,10 +64,9 @@ export default function Dashboard({ onLogout }) {
 
 			<main className="max-w-3xl mx-auto p-6 space-y-6">
 				<ArticleForm
-					onCreated={() => {
-						setMsg("發布成功！");
-						load();
-					}}
+					editing={editing}
+					onDone={handleDone}
+					onCancel={() => setEditing(null)}
 				/>
 
 				{msg && <p className="text-green-700 text-sm">{msg}</p>}
@@ -60,7 +80,9 @@ export default function Dashboard({ onLogout }) {
 							{articles.map((a) => (
 								<li
 									key={a.id}
-									className="py-3 flex items-center justify-between gap-4"
+									className={`py-3 flex items-center justify-between gap-4 ${
+										editing && editing.id === a.id ? "bg-amber-50 -mx-2 px-2 rounded" : ""
+									}`}
 								>
 									<div className="min-w-0">
 										<p className="truncate">{a.title}</p>
@@ -68,12 +90,20 @@ export default function Dashboard({ onLogout }) {
 											{a.date} · /{a.slug}
 										</p>
 									</div>
-									<button
-										onClick={() => handleDelete(a)}
-										className="text-sm text-red-600 hover:underline shrink-0"
-									>
-										刪除
-									</button>
+									<div className="flex items-center gap-3 shrink-0">
+										<button
+											onClick={() => startEdit(a)}
+											className="text-sm text-neutral-600 hover:underline"
+										>
+											編輯
+										</button>
+										<button
+											onClick={() => handleDelete(a)}
+											className="text-sm text-red-600 hover:underline"
+										>
+											刪除
+										</button>
+									</div>
 								</li>
 							))}
 						</ul>

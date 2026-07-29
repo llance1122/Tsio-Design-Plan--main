@@ -31,6 +31,30 @@ export async function fetchArticles() {
 	return r.json();
 }
 
+// 取單篇完整資料（含內文區塊），用於編輯時帶入表單
+export async function fetchArticle(slug) {
+	const r = await fetch(`/api/articles/${slug}`);
+	if (!r.ok) throw new Error("讀取文章失敗");
+	return r.json();
+}
+
+export async function updateArticle(id, formData) {
+	const r = await fetch(`/api/articles/${id}`, {
+		method: "PUT",
+		headers: { Authorization: `Bearer ${getToken()}` },
+		body: formData,
+	});
+	if (r.status === 401) {
+		clearToken();
+		throw new Error("登入已失效，請重新登入");
+	}
+	if (!r.ok) {
+		const e = await r.json().catch(() => ({}));
+		throw new Error(e.error || "更新失敗");
+	}
+	return r.json();
+}
+
 export async function createArticle(formData) {
 	const r = await fetch("/api/articles", {
 		method: "POST",

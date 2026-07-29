@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import defaultHero from "../assets/imgs/Exhibition_1.jpg";
+// 沒上傳海報時的預設圖：與文章列表卡片用同一張，避免「列表一張、內頁另一張」的錯覺
+import defaultHero from "../assets/imgs/default-cover.jpg";
 
 export default function SingleArticlePage() {
 	const { articleId } = useParams(); // 這裡的值其實是文章 slug
