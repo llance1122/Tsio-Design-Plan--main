@@ -1,0 +1,38 @@
+[
+	{
+		"id": "UX-W001",
+		"title": "使用者經驗設計入門：從零到一的思考流程",
+		"description": "本工作坊專為UX初學者設計，將引導參與者從使用者訪談、Persona建立，到資訊架構規劃，掌握完整的UX設計流程。",
+		"date": "2025/09/20",
+		"time": "13:00 - 17:00",
+		"location": "設計學院 A201 教室",
+		"image": "UX-W001-cover"
+	},
+	{
+		"id": "REACT-W002",
+		"title": "React 實戰：State與Hooks深度解析",
+		"description": "針對具備基礎React知識的開發者。深入探討useState、useEffect等Hooks的使用情境與優化技巧，讓你寫出更高效能的元件。",
+		"date": "2025/10/05",
+		"time": "09:00 - 12:00",
+		"location": "線上會議室 (Zoom)",
+		"image": "REACT-W002-cover"
+	},
+	{
+		"id": "FONT-W003",
+		"title": "字體美學與排版設計工作坊",
+		"description": "探討不同字體在品牌與視覺傳達中的作用。學習中文與英文排版的最佳實踐，創造具影響力的平面作品。",
+		"date": "2025/09/28",
+		"time": "14:30 - 17:30",
+		"location": "城市文創中心 B 廳",
+		"image": "FONT-W003-cover"
+	},
+	{
+		"id": "PORT-W004",
+		"title": "設計師求職：打造亮眼個人作品集",
+		"description": "手把手教你如何策劃、編排和呈現你的設計作品。重點講解如何針對不同公司調整作品集內容，提高面試成功率。",
+		"date": "2025/10/12",
+		"time": "10:00 - 16:00",
+		"location": "育成中心會議室",
+		"image": "PORT-W004-cover"
+	}
+]

@@ -1,0 +1,195 @@
+@import url("https://fonts.googleapis.com/css2?family=Shippori+Mincho&family=Yuji+Syuku&display=swap");
+@import "tailwindcss";
+
+* {
+	box-sizing: border-box;
+}
+
+@theme {
+	--color-primary: #303030;
+	--color-gray: #d9d9d9;
+	--color-secondary: #f2f2f2;
+}
+
+@utility sr-only {
+	/* icon替代文字 */
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+}
+
+@utility heading {
+	font-family: "Shippori Mincho", serif;
+	font-size: 22px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility heading-bold {
+	font-family: "Shippori Mincho", serif;
+	font-weight: 600;
+	font-size: 22px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility subtitle-bold {
+	font-family: "Shippori Mincho", serif;
+	font-weight: 600;
+	font-size: 16px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility subtitle {
+	font-family: "Shippori Mincho", serif;
+	font-size: 16px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility footer {
+	font-family: "Shippori Mincho", serif;
+	font-size: 14px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility bodyText-bold {
+	font-family: "Shippori Mincho", serif;
+	font-weight: 600;
+	font-size: 14px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility bodyText {
+	font-family: "Shippori Mincho", serif;
+	font-size: 14px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility heading-bold-web {
+	font-family: "Shippori Mincho", serif;
+	font-weight: 300;
+	font-size: 30px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility heading-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 30px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility subtitle-bold-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 24px;
+	letter-spacing: 0.1em;
+	font-weight: 600;
+	color: #303030;
+}
+
+@utility subtitle-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 24px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility bodyText-large-bold-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 18px;
+	letter-spacing: 0.1em;
+	font-weight: 600;
+	color: #303030;
+}
+
+@utility bodyText-large-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 18px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility bodyText-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 16px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility concept-title {
+	font-family: "Shippori Mincho", serif;
+	font-size: 36px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+@utility concept-title-web {
+	font-family: "Shippori Mincho", serif;
+	font-size: 60px;
+	letter-spacing: 0.1em;
+	color: #303030;
+}
+
+/* ----------------------------------------------------- */
+/* Nav hover 底線                                          */
+/* 滑入：origin 在左 → 底線由左往右展開                     */
+/* 滑出：origin 回到右 → 左緣往右收，看起來是往右滑走        */
+/* 時長 / 緩動讀 motion.js 注入的 CSS 變數，改那邊即全站同步  */
+/* ----------------------------------------------------- */
+@utility nav-underline {
+	position: relative;
+	display: inline-block;
+
+	&::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: -4px;
+		width: 100%;
+		height: 1px;
+		background-color: currentColor;
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform var(--motion-base) var(--motion-ease-standard);
+	}
+
+	&:hover::after,
+	&:focus-visible::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+}
+
+/* ----------------------------------------------------- */
+/* 調整分頁點顏色 */
+/* ----------------------------------------------------- */
+
+/* 設置選中點的顏色 (活躍點) */
+.article-swiper-container .swiper-pagination-bullet-active {
+	background: #303030; /* 例如：鮮紅色或你的品牌主色 */
+}
+
+/* ----------------------------------------------------- */
+/* 調整分頁點位置 */
+/* ----------------------------------------------------- */
+
+/* 調整分頁點容器的位置 */
+.article-swiper-container .swiper-pagination {
+	/* 預設是 bottom: 0;，將其上移 
+       注意：你可能需要調整 ArticleCarousel 內的 padding 來騰出空間 */
+	bottom: -5px !important;
+
+	/* 如果你想讓點點更靠近卡片，而不是靠容器底部 */
+	/* top: 100%; */
+}
