@@ -16,7 +16,8 @@ services:
       - DATA_DIR=/data
       # 網站掛的子路徑，必須與打包時 vite base 一致（見 vite.config.js）
       - BASE_PATH=/tsio-design
-      # ↓↓↓ 上線前一定要改這兩個 ↓↓↓
-      - ADMIN_PASSWORD=請改成你的後台密碼
-      - JWT_SECRET=請改成一長串隨機字元
+      # 密碼與密鑰從同目錄的 .env 檔讀取（.env 不進 git，git pull 不會覆蓋）
+      # 部署前在專案資料夾建立 .env（可複製 .env.example）
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     restart: unless-stopped

@@ -31,3 +31,6 @@ server/data.db
 server/data.db-*
 server/uploads/*
 !server/uploads/.gitkeep
+
+# NAS 部署時掛載的資料夾（資料庫 + 上傳圖），不進 git
+/data

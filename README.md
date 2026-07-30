@@ -57,9 +57,13 @@ npm run dev
 ## 部署（Docker）
 
 ```bash
-# 在 docker-compose.yml 改好 ADMIN_PASSWORD 與 JWT_SECRET 後
+# 1. 建立 .env 並填入 ADMIN_PASSWORD 與 JWT_SECRET
+cp .env.example .env
+# 2. 建置並啟動
 docker compose up -d --build
 ```
+
+日後更新：`git pull` 抓最新程式碼 → Container Manager 重新建置即可（`.env` 與 `data/` 不受影響）。
 
 容器在 `8080` 埠提供 `http://<host>:8080/tsio-design/`。
 資料（SQLite + 上傳圖片）保存在掛載的 `./data` 資料夾。詳見 [專案說明文件.md](專案說明文件.md)。
