@@ -1,8 +1,8 @@
 import Title from "../small_component/Title";
 import MoreLink from "../small_component/MoreLink";
-import workShop_1 from "../assets/workShop_1.jpg";
-import workShop_2 from "../assets/workShop_2.jpg";
-import workShop_3 from "../assets/workShop_3.jpeg";
+import workShop_1 from "../assets/photos/workShop_1.jpg";
+import workShop_2 from "../assets/photos/workShop_2.jpg";
+import workShop_3 from "../assets/photos/workShop_3.jpeg";
 
 export default function WorkShop() {
 	return (

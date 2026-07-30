@@ -1,5 +1,5 @@
-import plan_1 from "../assets/plan_1.jpg";
-import plan_2 from "../assets/plan_2.jpg";
+import plan_1 from "../assets/photos/plan_1.jpg";
+import plan_2 from "../assets/photos/plan_2.jpg";
 import Title from "../small_component/Title";
 import MoreLink from "../small_component/MoreLink";
 

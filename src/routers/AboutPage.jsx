@@ -1,9 +1,9 @@
 import Footer from "../index_component/Footer";
 import Nav from "../index_component/Nav";
 import Title from "../small_component/Title";
-import AboutPage_1 from "../assets/AboutPage_1.jpg";
-import AboutPage_2 from "../assets/AboutPage_2.jpg";
-import AboutPage_3 from "../assets/AboutPage_3.jpg";
+import AboutPage_1 from "../assets/photos/AboutPage_1.jpg";
+import AboutPage_2 from "../assets/photos/AboutPage_2.jpg";
+import AboutPage_3 from "../assets/photos/AboutPage_3.jpg";
 import { useEffect, useState } from "react";
 import useScrollReveal from "../hooks/useScrollReveal";
 import { interval } from "../config/motion";
