@@ -19,8 +19,9 @@ export function verifyPassword(password) {
 }
 
 export function issueToken() {
-	// 登入有效期 30 天：關閉瀏覽器後仍記住登入，減少重複輸入密碼
-	return jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "30d" });
+	// token 有效期（伺服器端上限）。前端用 sessionStorage 保存，
+	// 關閉瀏覽器即清除，所以重開後台一定要重新登入。
+	return jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "1d" });
 }
 
 // 保護需要登入的路由：檢查 Authorization: Bearer <token>
