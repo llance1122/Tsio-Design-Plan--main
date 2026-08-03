@@ -325,7 +325,7 @@ Tsio-Design-Plan/
 ├─ vite.config.js             前端 base 與開發代理
 ├─ eslint.config.js           程式碼檢查規則
 ├─ package.json               相依套件與指令
-└─ 專案說明文件.md              本文件（含操作手冊）
+└─ README.md                   本說明文件（含操作手冊）
 ```
 
 ## 14. Git 版本紀錄
