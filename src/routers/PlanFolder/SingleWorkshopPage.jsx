@@ -1,13 +1,33 @@
-import { useParams, NavLink } from "react-router";
+import { data, NavLink } from "react-router";
 import workshopsData from "../../data/workshops.json";
-import { workshopImages } from "../../data/imagesObjects";
-import defaultCover from "../../assets/imgs/default-cover.jpg";
+import { coverUrl } from "../../data/covers";
+import defaultCover from "../../assets/imgs/default-cover.webp";
 import Breadcrumbs from "../../small_component/Breadcrumbs";
 import Title from "../../small_component/Title";
+import { pageMeta } from "../../lib/meta";
+// 橫幅很寬，自動置中裁切會切到文字，改用另存的裁好版本（src/assets/og/）
+import ogImage from "../../assets/og/workshop_banner-og.webp?og";
 
-export default function SingleWorkshopPage() {
-	const { workshopId } = useParams();
-	const workshop = workshopsData.find((w) => w.id === workshopId);
+// 工作坊內頁：資料來自 workshops.json，打包時就依每筆資料產生好 HTML（見 react-router.config.js）
+export function loader({ params }) {
+	const workshop = workshopsData.find((w) => w.id === params.workshopId);
+	if (!workshop) return data({ workshop: null }, { status: 404 });
+	return { workshop };
+}
+
+export const meta = ({ loaderData, location }) => {
+	const workshop = loaderData?.workshop;
+	if (!workshop) return pageMeta({ title: "找不到工作坊", location, noindex: true });
+	return pageMeta({
+		title: workshop.title,
+		description: workshop.description,
+		image: ogImage,
+		location,
+	});
+};
+
+export default function SingleWorkshopPage({ loaderData }) {
+	const { workshop } = loaderData;
 
 	if (!workshop) {
 		return (
@@ -23,7 +43,7 @@ export default function SingleWorkshopPage() {
 		);
 	}
 
-	const cover = workshopImages[workshop.image] || defaultCover;
+	const cover = coverUrl(workshop.cover) || defaultCover;
 
 	return (
 		<section className="space-y-[10vh]">

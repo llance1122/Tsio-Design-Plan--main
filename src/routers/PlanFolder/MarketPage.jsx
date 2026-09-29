@@ -1,10 +1,26 @@
-import Footer from "../../index_component/Footer";
-import Nav from "../../index_component/Nav";
+import { NavLink } from "react-router";
 import Breadcrumbs from "../../small_component/Breadcrumbs";
 import Title from "../../small_component/Title";
 
 import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
-import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.jpg";
+import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
+import { pageMeta } from "../../lib/meta";
+import ogImage from "../../assets/imgs/ExhibitionBanner.webp?og";
+
+export const meta = ({ location }) =>
+	pageMeta({
+		title: "市集",
+		description: "延伸展覽精神的創意市集，集結手作品牌、獨立出版與插畫小物。",
+		image: ogImage,
+		location,
+	});
+
+// ============================================================
+//  市集分區：每區一個標題 + 兩張圖，要增減分區改這個陣列即可
+//  ⚠️ 目前三區都是同一份範例資料，上線前請換成真實內容
+// ============================================================
+const ZONE_SAMPLE = { title: "01. 手寫與印刷", images: [ExhibitionLayout, ExhibitionLayout] };
+const ZONES = [ZONE_SAMPLE, ZONE_SAMPLE, ZONE_SAMPLE];
 
 export default function MarketPage() {
 	return (
@@ -31,93 +47,42 @@ export default function MarketPage() {
 					</div>
 				</div>
 
-				<div>
-					<Title
-						className="headline"
-						title="01. 手寫與印刷"
-						layout="horizontal"
-					/>
-					<div className="w-full mx-auto px-[40px] mt-[var(--title-gap)] lg:max-w-7xl md:flex md:flex-row md:items-center md:justify-center">
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
-						</div>
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
+				{ZONES.map((zone, i) => (
+					<div key={i}>
+						<Title className="headline" title={zone.title} layout="horizontal" />
+						<div className="w-full mx-auto px-[40px] mt-[var(--title-gap)] lg:max-w-7xl md:flex md:flex-row md:items-center md:justify-center">
+							{zone.images.map((img, j) => (
+								<div key={j} className="w-full md:w-[450px] lg:w-[600px] aspect-square">
+									<img
+										className="w-full h-full object-cover"
+										src={img}
+										alt=""
+										loading="lazy"
+										decoding="async"
+									/>
+								</div>
+							))}
 						</div>
 					</div>
-				</div>
-
-				<div>
-					<Title
-						className="headline"
-						title="01. 手寫與印刷"
-						layout="horizontal"
-					/>
-					<div className="w-full mx-auto px-[40px] mt-[var(--title-gap)] lg:max-w-7xl md:flex md:flex-row md:items-center md:justify-center">
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
-						</div>
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
-						</div>
-					</div>
-				</div>
-
-				<div>
-					<Title
-						className="headline"
-						title="01. 手寫與印刷"
-						layout="horizontal"
-					/>
-					<div className="w-full mx-auto px-[40px] mt-[var(--title-gap)] lg:max-w-7xl md:flex md:flex-row md:items-center md:justify-center">
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
-						</div>
-						<div className="w-full md:w-[450px] lg:w-[600px] aspect-square">
-							<img
-								className="w-full h-full object-cover"
-								src={ExhibitionLayout}
-								alt=""
-							/>
-						</div>
-					</div>
-				</div>
+				))}
 
 				<div className="max-w-[82.2vw] mx-auto">
 					<hr className="border-t border-primary my-8 mb-[70px]" />
-					<div>
-						<Title
-							className="headline"
-							title="報名方式｜RESERVE A SEAT"
-							layout="horizontal"
-						/>
-					</div>
+					<Title
+						className="headline"
+						title="報名方式｜RESERVE A SEAT"
+						layout="horizontal"
+					/>
 					<p className="bodyText lg:bodyText-web text-center mt-[var(--title-gap-text)]">
 						想成為這場市集的一部分嗎？無論你是手作創作者、插畫家、獨立出版人，還是有獨特故事想分享的品牌，我們都期待你加入。
 					</p>
-					<button className="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block mt-[30px]">
+					{/* 原本是沒有動作的 <button>，改成連到報名頁 */}
+					<NavLink
+						to="/Enroll"
+						className="bodyText lg:bodyText-web bg-gray py-3 px-6 mx-auto block w-fit mt-[30px]"
+					>
 						立即報名 Register Now
-					</button>
+					</NavLink>
 				</div>
 			</main>
 		</section>

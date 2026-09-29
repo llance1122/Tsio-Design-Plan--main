@@ -2,7 +2,7 @@ import Title from "../small_component/Title";
 import MoreLink from "../small_component/MoreLink";
 import workShop_1 from "../assets/photos/workShop_1.webp";
 import workShop_2 from "../assets/photos/workShop_2.webp";
-import workShop_3 from "../assets/photos/workShop_3.jpeg";
+import workShop_3 from "../assets/photos/workShop_3.webp";
 
 export default function WorkShop() {
 	return (
@@ -15,6 +15,8 @@ export default function WorkShop() {
 							className="h-full w-full object-cover headline"
 							src={workShop_1}
 							alt=""
+							loading="lazy"
+							decoding="async"
 						/>
 					</div>
 				</div>
@@ -24,6 +26,8 @@ export default function WorkShop() {
 							className="h-full w-full object-cover headline"
 							src={workShop_2}
 							alt=""
+							loading="lazy"
+							decoding="async"
 						/>
 					</div>
 				</div>
@@ -42,6 +46,8 @@ export default function WorkShop() {
 						className="h-full w-full object-cover headline"
 						src={workShop_1}
 						alt=""
+						loading="lazy"
+						decoding="async"
 					/>
 				</div>
 			</div>
@@ -53,6 +59,8 @@ export default function WorkShop() {
 					className="absolute w-full h-full object-cover object-top headline"
 					src={workShop_3}
 					alt=""
+					loading="lazy"
+					decoding="async"
 				/>
 			</div>
 			<MoreLink

@@ -9,6 +9,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# 網站子路徑：打包時就要決定（寫進前端的網址），由 docker-compose 的 build args 傳入
+ARG BASE_PATH=""
+ENV BASE_PATH=$BASE_PATH
 RUN npm run build
 
 # ---- 執行階段：只裝正式相依，跑後端 ----
@@ -21,9 +24,10 @@ ENV DATA_DIR=/data
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# 後端程式、打包後的前端、以及匯入用的原始文章資料
+# 後端程式、react-router build 的輸出（瀏覽器端檔案 + 預先產生的頁面 + 伺服器渲染程式）、
+# 以及匯入用的原始文章資料
 COPY server ./server
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/build ./build
 COPY src/data ./src/data
 
 EXPOSE 3001

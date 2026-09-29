@@ -1,9 +1,21 @@
 import Breadcrumbs from "../../small_component/Breadcrumbs";
-import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.jpg";
+import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
 import WorkshopBanner from "../../assets/imgs/workshop_banner.webp";
 import Workshop_1 from "../../assets/imgs/workshop_1.webp";
 import Workshop_2 from "../../assets/photos/workShop_1.webp";
 import MoreLink from "../../small_component/MoreLink";
+import { pageMeta } from "../../lib/meta";
+// 橫幅很寬，自動置中裁切會切到文字，改用另存的裁好版本（src/assets/og/）
+import ogImage from "../../assets/og/workshop_banner-og.webp?og";
+
+export const meta = ({ location }) =>
+	pageMeta({
+		title: "工作坊",
+		description:
+			"來自不同文化的職人，帶著木作、織品、陶藝與書寫走進現場。親手做一件作品，也為自己設下一場微型儀式。",
+		image: ogImage,
+		location,
+	});
 
 export default function WorkshopPage() {
 	return (
@@ -28,6 +40,8 @@ export default function WorkshopPage() {
 								className="w-full h-full object-cover"
 								src={Workshop_1}
 								alt=""
+								loading="lazy"
+								decoding="async"
 							/>
 						</div>
 
@@ -58,6 +72,8 @@ export default function WorkshopPage() {
 								className="w-full h-full object-cover"
 								src={Workshop_2}
 								alt=""
+								loading="lazy"
+								decoding="async"
 							/>
 						</div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { galleryParallax, duration, easing } from "../config/motion";
-import bgGray from "../assets/bg_gray.jpg";
+import bgGray from "../assets/bg_gray.webp";
 
 // ⬇⬇⬇ 找到正式圖片後，只要替換這幾行 import 即可 ⬇⬇⬇
 import img1 from "../assets/photos/DSCF8777.webp"; // 左上・直幅（大）
@@ -77,8 +77,8 @@ const galleryImages = [
 //  - 視差：以圖庫中心對視窗中心的偏移量當進度（-1 ～ +1），
 //    每張圖乘上自己的 speed，再用 lerp 平滑追隨 → 慣性漂浮感。
 //    transform 放在「外層 wrapper」，與內層 .headline 的
-//    ScrollReveal 淡入各自獨立、互不干擾。
-//  - 標語：不用 ScrollReveal（那會在標語隨內容上行時就提早觸發），
+//    捲動進場淡入各自獨立、互不干擾。
+//  - 標語：不用捲動進場的 .headline（那會在標語隨內容上行時就提早觸發），
 //    改在「釘住視窗中央的瞬間」才淡入 + 上浮，跟 MOTOYA 一樣。
 //    離場不用淡出 —— 由 Main.jsx 的白色蓋幕層（較高 z-index）
 //    從下方滑上來把釘住的標語蓋掉。

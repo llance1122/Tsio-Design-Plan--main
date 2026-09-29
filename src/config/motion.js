@@ -1,6 +1,6 @@
 // ============================================================
 //  Motion Design Tokens — 全站唯一動畫參數來源
-//  改這裡 → JS 動畫（ScrollReveal / Banner / 輪播）
+//  改這裡 → JS 動畫（捲動進場 / Banner / 輪播）
 //           + CSS 變數（Tailwind class 的 hover / Nav / 卡片）全部跟著改
 // ============================================================
 
@@ -36,17 +36,16 @@ export const marquee = {
 	duration: 32000,
 };
 
-// ---- 進場動畫（ScrollReveal，JS 專用）----
+// ---- 捲動進場動畫（hooks/useScrollReveal.js）----
+// 帶有 .headline 的元素捲進畫面時，由下往上淡入
 export const REVEAL_SELECTOR = ".headline";
 export const reveal = {
 	duration: duration.slow,
-	distance: "20px",
-	origin: "bottom",
+	distance: "20px", // 由下往上的位移量
 	easing: easing.spring,
 	// 觸發時機：元素露出多少比例才開始動畫（0=露出1px就觸發，1=完全進入才觸發）
 	// 覺得太早 → 調大；覺得太晚 → 調小
 	viewFactor: 0.7,
-	// reset: false, // 需要每次捲回都重播時可打開
 };
 
 // ---- 換頁進場（PageTransition，CSS 專用）----
@@ -79,20 +78,24 @@ export const banner = {
 };
 
 // ============================================================
-//  把 token 注入成 CSS 變數，供 Tailwind class 以 var() 讀取
-//  於 main.jsx 啟動時（render 前）呼叫一次即可
+//  把 token 輸出成 CSS 變數，供 Tailwind class 以 var() 讀取
+//  由 root.jsx 直接寫進每一頁 HTML 的 <head>，頁面一出現樣式就是對的
 // ============================================================
-export function applyMotionVars() {
-	const root = document.documentElement.style;
-	root.setProperty("--motion-fast", `${duration.fast}ms`);
-	root.setProperty("--motion-base", `${duration.base}ms`);
-	root.setProperty("--motion-slow", `${duration.slow}ms`);
-	root.setProperty("--motion-banner", `${duration.banner}ms`);
-	root.setProperty("--motion-ease-standard", easing.standard);
-	root.setProperty("--motion-ease-wipe", easing.wipe);
-	root.setProperty("--motion-ease-spring", easing.spring);
-	root.setProperty("--motion-marquee", `${marquee.duration}ms`);
-	root.setProperty("--page-enter-duration", `${pageEnter.duration}ms`);
-	root.setProperty("--page-enter-distance", pageEnter.distance);
-	root.setProperty("--page-enter-ease", pageEnter.easing);
+export function motionCssVars() {
+	return `:root {
+	--motion-fast: ${duration.fast}ms;
+	--motion-base: ${duration.base}ms;
+	--motion-slow: ${duration.slow}ms;
+	--motion-banner: ${duration.banner}ms;
+	--motion-ease-standard: ${easing.standard};
+	--motion-ease-wipe: ${easing.wipe};
+	--motion-ease-spring: ${easing.spring};
+	--motion-marquee: ${marquee.duration}ms;
+	--page-enter-duration: ${pageEnter.duration}ms;
+	--page-enter-distance: ${pageEnter.distance};
+	--page-enter-ease: ${pageEnter.easing};
+	--reveal-duration: ${reveal.duration}ms;
+	--reveal-distance: ${reveal.distance};
+	--reveal-ease: ${reveal.easing};
+}`;
 }

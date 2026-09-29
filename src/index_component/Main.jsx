@@ -6,12 +6,17 @@ import Article from "./Article";
 import Plan from "./Plan";
 import Exhibition from "./Exhibition";
 import WorkShop from "./WorkShop";
-import useScrollReveal from "../hooks/useScrollReveal";
+import { pageMeta } from "../lib/meta";
 
-export default function Main() {
-	// 全站 fade-in 統一在此初始化：凡帶有 .headline 的元素都會由下往上淡入
-	useScrollReveal();
+export const meta = ({ location }) => pageMeta({ location });
 
+// 首頁由伺服器即時產生（不預先產生），「報導」區塊才會永遠是最新的文章。
+// context.articles 由 server/index.js 提供，直接讀資料庫
+export function loader({ context }) {
+	return { latestArticles: context.articles.list().slice(0, 3) };
+}
+
+export default function Main({ loaderData }) {
 	return (
 		<main className="space-y-[80px] lg:space-y-[300px]">
 			<Banner />
@@ -33,7 +38,7 @@ export default function Main() {
 				<Exhibition />
 				<WorkShop />
 				<Plan />
-				<Article />
+				<Article latestArticles={loaderData.latestArticles} />
 			</div>
 		</main>
 	);

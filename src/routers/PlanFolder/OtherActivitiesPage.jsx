@@ -1,10 +1,32 @@
 import Breadcrumbs from "../../small_component/Breadcrumbs";
-import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
 import ProfileCard from "../../small_component/ProfileCard";
 import Title from "../../small_component/Title";
 
-import movieCover_1 from "../../assets/imgs/movieCover_1.jpg";
-import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.jpg";
+import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
+import movieCover_1 from "../../assets/imgs/movieCover_1.webp";
+import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
+import { pageMeta } from "../../lib/meta";
+import ogImage from "../../assets/imgs/movieCover_1.webp?og";
+
+export const meta = ({ location }) =>
+	pageMeta({
+		title: "戶外電影",
+		description: "一塊幕布、一片星空，戶外電影帶你走進被影像喚醒的記憶。",
+		image: ogImage,
+		location,
+	});
+
+// ============================================================
+//  戶外電影片單：要換片改這個陣列即可
+//  ⚠️ 目前三筆都是同一份範例資料（片名含 Lorem），上線前請換成真實內容
+// ============================================================
+const FILM_SAMPLE = {
+	cover: movieCover_1,
+	title: "Film 01｜Lorem in the Wind",
+	intro:
+		"在一個海邊小鎮，風總會帶來來自遠方的聲音。一名少年偶然聽見了屬於過去的秘密，開始踏上尋找答案的旅程。這是一部關於傾聽與等待的電影，像風一樣輕柔，卻能穿透時間。",
+};
+const FILMS = [FILM_SAMPLE, FILM_SAMPLE, FILM_SAMPLE];
 
 export default function OtherActivitiesPage() {
 	return (
@@ -33,42 +55,23 @@ export default function OtherActivitiesPage() {
 				</div>
 
 				<div>
+					{/* 原標題是從講座頁複製來的「講者介紹」，這區放的是電影，改成片單 */}
 					<Title
 						className="headline"
-						title="講者介紹｜GUEST SPEAKERS"
+						title="放映片單｜FILMS"
 						layout="horizontal"
 					/>
-					<div className="headline w-full mx-auto px-[40px] mt-[var(--title-gap)] space-y-[100px] lg:space-y-[100px] lg:max-w-7xl">
-						<ProfileCard
-							size={"350px"}
-							src={movieCover_1}
-							name="Film 01｜Lorem in the Wind"
-							job="產品設計師／自由創作者"
-							variant="movie"
-							content={
-								"在一個海邊小鎮，風總會帶來來自遠方的聲音。一名少年偶然聽見了屬於過去的秘密，開始踏上尋找答案的旅程。這是一部關於傾聽與等待的電影，像風一樣輕柔，卻能穿透時間。"
-							}
-						/>
-						<ProfileCard
-							size={"350px"}
-							src={movieCover_1}
-							name="Film 01｜Lorem in the Wind"
-							job="產品設計師／自由創作者"
-							variant="movie"
-							content={
-								"在一個海邊小鎮，風總會帶來來自遠方的聲音。一名少年偶然聽見了屬於過去的秘密，開始踏上尋找答案的旅程。這是一部關於傾聽與等待的電影，像風一樣輕柔，卻能穿透時間。"
-							}
-						/>
-						<ProfileCard
-							size={"350px"}
-							src={movieCover_1}
-							name="Film 01｜Lorem in the Wind"
-							job="產品設計師／自由創作者"
-							variant="movie"
-							content={
-								"在一個海邊小鎮，風總會帶來來自遠方的聲音。一名少年偶然聽見了屬於過去的秘密，開始踏上尋找答案的旅程。這是一部關於傾聽與等待的電影，像風一樣輕柔，卻能穿透時間。"
-							}
-						/>
+					<div className="headline w-full mx-auto px-[40px] mt-[var(--title-gap)] space-y-[100px] lg:max-w-7xl">
+						{FILMS.map((f, i) => (
+							<ProfileCard
+								key={i}
+								size="350px"
+								src={f.cover}
+								name={f.title}
+								variant="movie"
+								content={f.intro}
+							/>
+						))}
 					</div>
 				</div>
 
@@ -78,6 +81,8 @@ export default function OtherActivitiesPage() {
 							className="w-full h-full object-cover"
 							src={ExhibitionLayout}
 							alt=""
+							loading="lazy"
+							decoding="async"
 						/>
 					</div>
 
@@ -85,6 +90,7 @@ export default function OtherActivitiesPage() {
 						<h2 className="subtitle-bold lg:subtitle-bold-web">
 							活動資訊｜Event Info
 						</h2>
+						{/* ⚠️ 假文字，上線前請換成實際的放映時間、地點 */}
 						<p className="bodyText lg:bodyText-bold-web">
 							Lorem ipsum dolor sit amet consectetur adipisicing elit.
 							Doloremque odit dicta eum tempore doloribus repudiandae quasi
@@ -96,13 +102,11 @@ export default function OtherActivitiesPage() {
 
 				<div className="max-w-[82.2vw] mx-auto">
 					<hr className="border-t border-primary my-8 mb-[70px]" />
-					<div>
-						<Title
-							className="headline"
-							title="注意事項｜Notice"
-							layout="horizontal"
-						/>
-					</div>
+					<Title
+						className="headline"
+						title="注意事項｜Notice"
+						layout="horizontal"
+					/>
 					<p className="bodyText lg:bodyText-web text-center mt-[var(--title-gap-text)]">
 						活動當日請自備坐墊或野餐墊。如遇雨天，活動將改至室內或延期，將於社群公告。現場可攜帶輕食與飲料，並請自行帶走垃圾。
 					</p>

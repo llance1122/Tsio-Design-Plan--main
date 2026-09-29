@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
+# react-router build 的輸出與自動產生的型別
+/build
+.react-router
 dist-ssr
 *.local
 

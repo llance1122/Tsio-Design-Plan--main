@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router";
 // ============================================================
 //  PageTransition
 //  換頁進場動畫：切換路由時，整頁內容淡入 + 微微上浮，
-//  手感刻意對齊 ScrollReveal 的 .headline（同一組 motion token）。
+//  手感刻意對齊捲動進場的 .headline（同一組 motion token）。
 //
 //  重點說明：
 //  - key={pathname}：換路由時強制重新掛載，CSS animation 才會重新播放。

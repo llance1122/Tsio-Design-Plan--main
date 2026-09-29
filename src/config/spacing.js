@@ -19,17 +19,11 @@ export const titleGapText = {
 };
 
 // ============================================================
-//  把 token 注入成「帶斷點」的 CSS 變數，供 mt-[var(--title-gap)] 讀取
-//  斷點值無法用 style.setProperty 表達，所以改注入 <style> 標籤
-//  於 main.jsx 啟動時（render 前）呼叫一次即可
+//  把 token 輸出成「帶斷點」的 CSS 變數，供 mt-[var(--title-gap)] 讀取
+//  由 root.jsx 直接寫進每一頁 HTML 的 <head>
 // ============================================================
-export function applySpacingVars() {
-	const style = document.createElement("style");
-	style.id = "spacing-tokens";
-	style.textContent = `
-:root { --title-gap: ${titleGap.mobile}px; --title-gap-text: ${titleGapText.mobile}px; }
+export function spacingCssVars() {
+	return `:root { --title-gap: ${titleGap.mobile}px; --title-gap-text: ${titleGapText.mobile}px; }
 @media (min-width: 768px) { :root { --title-gap: ${titleGap.tablet}px; --title-gap-text: ${titleGapText.tablet}px; } }
-@media (min-width: 1024px) { :root { --title-gap: ${titleGap.desktop}px; --title-gap-text: ${titleGapText.desktop}px; } }
-`;
-	document.head.appendChild(style);
+@media (min-width: 1024px) { :root { --title-gap: ${titleGap.desktop}px; --title-gap-text: ${titleGapText.desktop}px; } }`;
 }

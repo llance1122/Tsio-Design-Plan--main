@@ -1,24 +1,22 @@
-import Footer from "../index_component/Footer";
-import Nav from "../index_component/Nav";
-import Breadcrumbs from "../small_component/Breadcrumbs";
 import Title from "../small_component/Title";
-import Bg_gray from "../assets/bg_gray.jpg";
+import Bg_gray from "../assets/bg_gray.webp";
 import ExhibitionCard from "../small_component/ExhibitionCard";
 
-import Others from "../assets/imgs/Exhibition_1.jpg";
+import Others from "../assets/imgs/Exhibition_1.webp";
 import Exhibition from "../assets/imgs/ExhibitionBanner.webp";
-import useScrollReveal from "../hooks/useScrollReveal";
+import { pageMeta } from "../lib/meta";
+
+export const meta = ({ location }) =>
+	pageMeta({
+		title: "計劃",
+		description: "展覽、工作坊、市集、講座與戶外電影 — 設醮的各項活動。",
+		location,
+	});
 
 export default function PlanPage() {
-	useScrollReveal();
-
 	return (
 		<section className="space-y-[10vh]">
 			<main className="space-y-[10vh] lg:space-y-[20vh] mt-[15vh] lg:mt-[24vh]">
-				{/* <div className="w-full  mx-auto px-[40px] lg:max-w-7xl">
-					<Breadcrumbs word="Plan" />
-				</div> */}
-
 				<div className="lg:pb-[10vh] bg-white">
 					<Title className="headline" titleEN="Plan" title="計劃" />
 					<div className="headline mx-auto w-[82.2vw] mt-[var(--title-gap-text)] lg:w-[900px]">

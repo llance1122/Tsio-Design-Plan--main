@@ -4,7 +4,11 @@
 # ============================================================
 services:
   tsio:
-    build: .
+    build:
+      context: .
+      args:
+        # 前端打包時要知道子路徑，與下方執行時的 BASE_PATH 同一個來源（.env）
+        - BASE_PATH=${BASE_PATH:-}
     container_name: tsio-design
     ports:
       # 左邊是 NAS 對外的埠（可自行改），右邊 3001 是容器內的埠（勿改）
@@ -14,8 +18,9 @@ services:
       - ./data:/data
     environment:
       - DATA_DIR=/data
-      # 網站掛的子路徑，必須與打包時 vite base 一致（見 vite.config.js）
-      - BASE_PATH=/tsio-design
+      # 網站掛的子路徑，在 .env 設定（留空 = 網域根目錄）。
+      # 前端打包與後端路由都讀這一個值，不會再兩邊對不上
+      - BASE_PATH=${BASE_PATH:-}
       # 密碼與密鑰從同目錄的 .env 檔讀取（.env 不進 git，git pull 不會覆蓋）
       # 部署前在專案資料夾建立 .env（可複製 .env.example）
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}

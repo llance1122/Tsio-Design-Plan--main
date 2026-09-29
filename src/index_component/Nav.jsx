@@ -62,9 +62,9 @@ export default function Nav() {
 
 	/*
 	  Project 下拉選單：
-	  面板不能放在 <nav> 裡 —— nav 整條套了 mix-blend-difference，
-	  放進去會連面板一起被反差混色（白底變黑底）。
-	  所以面板做成 nav 的兄弟元素，開啟時量測 Project 項目的座標來定位。
+	  面板做成 nav 的兄弟元素，開啟時量測 Project 項目的座標來定位。
+	  （當初是因為 nav 套了 mix-blend-difference，放在裡面會被一起混色；
+	  現在 nav 已改成自適應字色，但面板的 z-index 與命中範圍都依這個結構調過，維持不動。）
 	*/
 	const [projectOpen, setProjectOpen] = useState(false);
 	const [panelPos, setPanelPos] = useState({ left: 0, top: 0 });
@@ -180,7 +180,7 @@ export default function Nav() {
 				/>
 				<div className="w-[92.2vw] mx-auto">
 					<div className="w-full flex justify-between items-center lg:justify-between">
-						{/* 【變更 2】當選單展開時，動態隱藏 Logo */}
+						{/* 手機選單展開時隱藏 Logo */}
 						<NavLink
 							to="/"
 							onClick={handleNavLinkClick}
@@ -232,7 +232,6 @@ export default function Nav() {
 							</div>
 						</button>
 
-						{/* ... Desktop ul ... */}
 						<ul
 							className="hidden lg:flex space-x-[60px] bodyText-large-bold-web"
 							style={{ color: navInk, transition: inkTransition }}
@@ -360,7 +359,6 @@ export default function Nav() {
 							className="space-y-8 bodyText-large-bold-web"
 							style={{ color: "#ffffff" }}
 						>
-							{/* ... NavLink list items ... */}
 							<li>
 								<NavLink
 									to="/About"

@@ -14,6 +14,8 @@ export default function Plan() {
 							className="headline w-full h-full object-cover"
 							src={plan_1}
 							alt=""
+							loading="lazy"
+							decoding="async"
 						/>
 					</div>
 					<div className="headline bodyText w-[300px] lg:w-[350px] mx-auto lg:bodyText-large-web">
@@ -30,6 +32,8 @@ export default function Plan() {
 						className="headline w-full h-full object-cover"
 						src={plan_2}
 						alt=""
+						loading="lazy"
+						decoding="async"
 					/>
 				</div>
 			</div>

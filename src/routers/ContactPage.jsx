@@ -1,7 +1,8 @@
-import Nav from "../index_component/Nav";
-import Footer from "../index_component/Footer";
 import IgIcon from "../assets/icons/ig_black.png";
 import ThreadIcon from "../assets/icons/thread_black.png";
+import { pageMeta } from "../lib/meta";
+
+export const meta = ({ location }) => pageMeta({ title: "聯絡我們", location });
 
 export default function ContactPage() {
 	return (

@@ -3,6 +3,7 @@
 //  GET    /api/articles        文章列表（不含內文，給列表頁）
 //  GET    /api/articles/:slug  單篇文章（含內文區塊）
 //  POST   /api/articles        新增文章（需登入，可上傳海報）
+//  PUT    /api/articles/:id    更新文章（需登入，可換海報，slug 不變）
 //  DELETE /api/articles/:id    刪除文章（需登入）
 // ============================================================
 import { Router } from "express";
@@ -11,6 +12,7 @@ import path from "node:path";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import db from "../db.js";
+import { listArticles, findArticle } from "../articles.js";
 import { UPLOAD_DIR } from "../config.js";
 import { requireAuth } from "../auth.js";
 
@@ -54,35 +56,50 @@ function sanitizeBlocks(raw) {
 		.map((b) => ({ type: b.type, content: b.content }));
 }
 
+// 刪除 uploads 裡的海報檔（只處理本站上傳的 /uploads/ 路徑）
+function removeUpload(cover) {
+	if (!cover || !cover.startsWith("/uploads/")) return;
+	fs.rm(path.join(UPLOAD_DIR, path.basename(cover)), { force: true }, () => {});
+}
+
+// 新增與更新共用的欄位檢查。
+// 格式不對時回傳 { error }，並把這次剛上傳的海報刪掉，避免 uploads 裡留下沒人用的檔案
+function readArticleBody(req) {
+	const { title, description = "", date = "", location = "" } = req.body;
+	let error = null;
+	const blocks = sanitizeBlocks(req.body.blocks);
+	if (!title || !title.trim()) error = "缺少文章標題";
+	else if (blocks === null) error = "內文（blocks）格式錯誤";
+
+	if (error) {
+		if (req.file) removeUpload(`/uploads/${req.file.filename}`);
+		return { error };
+	}
+	return {
+		title: title.trim(),
+		description,
+		date,
+		location,
+		blocks: JSON.stringify(blocks),
+	};
+}
+
 // ---- 列表：不回傳內文，減少傳輸量 ----
 router.get("/", (req, res) => {
-	const rows = db
-		.prepare(
-			"SELECT id, slug, title, description, date, location, cover, created_at FROM articles ORDER BY created_at DESC, id DESC"
-		)
-		.all();
-	res.json(rows);
+	res.json(listArticles());
 });
 
 // ---- 單篇：含內文區塊 ----
 router.get("/:slug", (req, res) => {
-	const row = db.prepare("SELECT * FROM articles WHERE slug = ?").get(req.params.slug);
+	const row = findArticle("slug", req.params.slug);
 	if (!row) return res.status(404).json({ error: "找不到文章" });
-	row.blocks = JSON.parse(row.blocks);
 	res.json(row);
 });
 
 // ---- 新增（需登入）----
 router.post("/", requireAuth, upload.single("cover"), (req, res) => {
-	const { title, description = "", date = "", location = "" } = req.body;
-	if (!title || !title.trim()) {
-		return res.status(400).json({ error: "缺少文章標題" });
-	}
-
-	const blocks = sanitizeBlocks(req.body.blocks);
-	if (blocks === null) {
-		return res.status(400).json({ error: "內文（blocks）格式錯誤" });
-	}
+	const body = readArticleBody(req);
+	if (body.error) return res.status(400).json({ error: body.error });
 
 	const cover = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -94,64 +111,40 @@ router.post("/", requireAuth, upload.single("cover"), (req, res) => {
 			`INSERT INTO articles (slug, title, description, date, location, cover, blocks)
 			 VALUES (?, ?, ?, ?, ?, ?, ?)`
 		)
-		.run(tempSlug, title.trim(), description, date, location, cover, JSON.stringify(blocks));
+		.run(tempSlug, body.title, body.description, body.date, body.location, cover, body.blocks);
 
 	const id = Number(info.lastInsertRowid);
-	const slug = `a-${id}`;
-	db.prepare("UPDATE articles SET slug = ? WHERE id = ?").run(slug, id);
+	db.prepare("UPDATE articles SET slug = ? WHERE id = ?").run(`a-${id}`, id);
 
-	const created = db.prepare("SELECT * FROM articles WHERE id = ?").get(id);
-	created.blocks = JSON.parse(created.blocks);
-	res.status(201).json(created);
+	res.status(201).json(findArticle("id", id));
 });
 
 // ---- 更新（需登入）----
 // 不改動 slug（保留原網址）；有上傳新海報才換圖，否則沿用原本的
 router.put("/:id", requireAuth, upload.single("cover"), (req, res) => {
-	const existing = db
-		.prepare("SELECT * FROM articles WHERE id = ?")
-		.get(req.params.id);
-	if (!existing) return res.status(404).json({ error: "找不到文章" });
-
-	const { title, description = "", date = "", location = "" } = req.body;
-	if (!title || !title.trim()) {
-		return res.status(400).json({ error: "缺少文章標題" });
+	const existing = db.prepare("SELECT cover FROM articles WHERE id = ?").get(req.params.id);
+	if (!existing) {
+		if (req.file) removeUpload(`/uploads/${req.file.filename}`);
+		return res.status(404).json({ error: "找不到文章" });
 	}
 
-	const blocks = sanitizeBlocks(req.body.blocks);
-	if (blocks === null) {
-		return res.status(400).json({ error: "內文（blocks）格式錯誤" });
-	}
+	const body = readArticleBody(req);
+	if (body.error) return res.status(400).json({ error: body.error });
 
 	// 有上傳新海報 → 換圖並刪掉舊檔；沒有 → 保留原 cover
 	let cover = existing.cover;
 	if (req.file) {
 		cover = `/uploads/${req.file.filename}`;
-		if (existing.cover && existing.cover.startsWith("/uploads/")) {
-			const oldFile = path.join(UPLOAD_DIR, path.basename(existing.cover));
-			fs.rm(oldFile, { force: true }, () => {});
-		}
+		removeUpload(existing.cover);
 	}
 
 	db.prepare(
 		`UPDATE articles
 		 SET title = ?, description = ?, date = ?, location = ?, cover = ?, blocks = ?
 		 WHERE id = ?`
-	).run(
-		title.trim(),
-		description,
-		date,
-		location,
-		cover,
-		JSON.stringify(blocks),
-		req.params.id
-	);
+	).run(body.title, body.description, body.date, body.location, cover, body.blocks, req.params.id);
 
-	const updated = db
-		.prepare("SELECT * FROM articles WHERE id = ?")
-		.get(req.params.id);
-	updated.blocks = JSON.parse(updated.blocks);
-	res.json(updated);
+	res.json(findArticle("id", req.params.id));
 });
 
 // ---- 刪除（需登入）----
@@ -160,12 +153,7 @@ router.delete("/:id", requireAuth, (req, res) => {
 	if (!row) return res.status(404).json({ error: "找不到文章" });
 
 	db.prepare("DELETE FROM articles WHERE id = ?").run(req.params.id);
-
-	// 一併刪除上傳的海報檔（若有且在 uploads 內）
-	if (row.cover && row.cover.startsWith("/uploads/")) {
-		const file = path.join(UPLOAD_DIR, path.basename(row.cover));
-		fs.rm(file, { force: true }, () => {});
-	}
+	removeUpload(row.cover); // 一併刪除上傳的海報檔
 	res.json({ ok: true });
 });
 

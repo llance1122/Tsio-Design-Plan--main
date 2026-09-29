@@ -279,9 +279,9 @@
 /* ----------------------------------------------------- */
 /* 換頁進場（PageTransition.jsx）                          */
 /* 切換路由時整頁淡入 + 由下往上浮 20px，                   */
-/* 跟 ScrollReveal 的 .headline 是同一組手感。              */
+/* 跟捲動進場的 .headline 是同一組手感。                  */
 /*                                                         */
-/* 參數全部讀 motion.js 注入的 --page-enter-*，             */
+/* 參數全部讀 motion.js 輸出的 --page-enter-*，           */
 /* 要調快慢／幅度／曲線請改 config/motion.js 的 pageEnter。 */
 /*                                                         */
 /* fill-mode 用 backwards 不用 forwards/both：              */
@@ -308,5 +308,32 @@
 @media (prefers-reduced-motion: reduce) {
 	.page-enter {
 		animation: none;
+	}
+}
+
+/* ----------------------------------------------------- */
+/* 捲動進場（hooks/useScrollReveal.js）                    */
+/* .headline 捲進畫面時由下往上淡入。                       */
+/* 只有 <html> 帶 js-reveal（JS 有執行）時才先隱藏，         */
+/* 搜尋引擎與關閉 JS 的瀏覽器會直接看到完整內容。            */
+/* 用 transform 而不是 translate：Tailwind v4 的 translate-* */
+/* 走獨立的 translate 屬性，兩者疊加互不覆蓋。              */
+/* 進場後 transform 回到 none，不殘留（理由同上方換頁動畫）。 */
+/* ----------------------------------------------------- */
+.js-reveal .headline:not(.is-revealed) {
+	opacity: 0;
+	transform: translateY(var(--reveal-distance));
+}
+
+.js-reveal .headline {
+	transition:
+		opacity var(--reveal-duration) var(--reveal-ease),
+		transform var(--reveal-duration) var(--reveal-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.js-reveal .headline:not(.is-revealed) {
+		opacity: 1;
+		transform: none;
 	}
 }

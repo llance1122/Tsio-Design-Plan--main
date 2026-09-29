@@ -1,4 +1,4 @@
-import defaultCover from "../assets/imgs/default-cover.jpg";
+import defaultCover from "../assets/imgs/default-cover.webp";
 
 // 報名狀態 → 徽章文字與配色
 // open 用深底白字（要跳出來），額滿／截止用灰底（存在但收斂）

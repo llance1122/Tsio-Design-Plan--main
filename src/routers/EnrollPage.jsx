@@ -1,5 +1,9 @@
 import enrolls from "../data/enrolls";
 import EnrollCard from "../small_component/EnrollCard";
+import { pageMeta } from "../lib/meta";
+
+export const meta = ({ location }) =>
+	pageMeta({ title: "報名參與", description: "設醮各項活動報名資訊。", location });
 
 export default function EnrollPage() {
 	return (

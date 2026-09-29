@@ -1,18 +1,29 @@
-import Breadcrumbs from "../../small_component/Breadcrumbs";
-import Title from "../../small_component/Title";
-import Attendee from "../../assets/dialoguesPhotos/Attendee.webp";
-import LuChiChun from "../../assets/dialoguesPhotos/LuChiChun.webp";
-import ChunYenChiu from "../../assets/dialoguesPhotos/ChunYenChiu.webp";
-import Cyan from "../../assets/dialoguesPhotos/Cyan.webp";
-import EvelynLee from "../../assets/dialoguesPhotos/EvelynLee.webp";
-import ChouYuChen from "../../assets/dialoguesPhotos/ChouYuChen.webp";
-import YangHsinI from "../../assets/dialoguesPhotos/YangHsinI.webp";
-import HuangKuanWei from "../../assets/dialoguesPhotos/HuangKuanWei.webp";
-import ChangYuJu from "../../assets/dialoguesPhotos/ChangYuJu.webp";
-import KaoYunHsuanChangYuJu from "../../assets/dialoguesPhotos/KaoYunHsuanChangYuJu.webp";
-import PengHsiuHsiung from "../../assets/dialoguesPhotos/PengHsiuHsiung.webp";
+import Breadcrumbs from "../../../small_component/Breadcrumbs";
+import Title from "../../../small_component/Title";
+import Attendee from "../../../assets/dialoguesPhotos/Attendee.webp";
+import LuChiChun from "../../../assets/dialoguesPhotos/LuChiChun.webp";
+import ChunYenChiu from "../../../assets/dialoguesPhotos/ChunYenChiu.webp";
+import Cyan from "../../../assets/dialoguesPhotos/Cyan.webp";
+import EvelynLee from "../../../assets/dialoguesPhotos/EvelynLee.webp";
+import ChouYuChen from "../../../assets/dialoguesPhotos/ChouYuChen.webp";
+import YangHsinI from "../../../assets/dialoguesPhotos/YangHsinI.webp";
+import HuangKuanWei from "../../../assets/dialoguesPhotos/HuangKuanWei.webp";
+import ChangYuJu from "../../../assets/dialoguesPhotos/ChangYuJu.webp";
+import KaoYunHsuanChangYuJu from "../../../assets/dialoguesPhotos/KaoYunHsuanChangYuJu.webp";
+import PengHsiuHsiung from "../../../assets/dialoguesPhotos/PengHsiuHsiung.webp";
 
-import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
+import ExhibitionBanner from "../../../assets/imgs/ExhibitionBanner.webp";
+import { pageMeta } from "../../../lib/meta";
+import ogImage from "../../../assets/imgs/ExhibitionBanner.webp?og";
+
+export const meta = ({ location }) =>
+	pageMeta({
+		title: "對話的對話—在彼此的痕跡中流動",
+		description:
+			"以「對話」為核心命題，探索存在主義哲學脈絡下的自我建構與創作關係。每一次對話皆會留下痕跡，在人、物、思想之間形成微妙而深層的連結。",
+		image: ogImage,
+		location,
+	});
 
 // 參與人員：外層每個陣列是一行，同一行的職稱並排（窄螢幕會自動換行）
 const CREDITS = [
@@ -236,6 +247,8 @@ export default function ExhibitionPage() {
 						className="w-full mt-[var(--title-gap-text)]"
 						src={Attendee}
 						alt="參與者共同創作參考圖"
+						loading="lazy"
+						decoding="async"
 					/>
 					<div className="headline mx-auto w-[82.2vw] mt-[var(--title-gap-text)] lg:w-[900px]">
 						<p className="headline bodyText lg:bodyText-web">
@@ -268,6 +281,8 @@ export default function ExhibitionPage() {
 										className={`h-full w-full object-cover ${work.imageClassName ?? ""}`}
 										src={work.image}
 										alt={`${work.artist} 作品`}
+										loading="lazy"
+										decoding="async"
 									/>
 								</div>
 								<div className="">
@@ -313,6 +328,8 @@ export default function ExhibitionPage() {
 										className="h-full w-full object-cover"
 										src={work.image}
 										alt={`${work.artist} 作品`}
+										loading="lazy"
+										decoding="async"
 									/>
 								</div>
 								<div className="min-w-0 self-start md:self-center">
@@ -354,6 +371,8 @@ export default function ExhibitionPage() {
 										className="h-full w-full object-cover"
 										src={work.image}
 										alt={`${work.artist} 作品`}
+										loading="lazy"
+										decoding="async"
 									/>
 								</div>
 

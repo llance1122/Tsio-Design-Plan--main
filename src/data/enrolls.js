@@ -2,7 +2,7 @@
 //  報名活動資料（Enroll 頁）
 //
 //  用 .js 而不是 .json，是為了能寫註解、也能直接 import 封面圖，
-//  不必像 workshops.json 那樣再繞一層 imagesObjects 對照表。
+//  不必像 workshops.json 那樣用檔名去對應（見 data/covers.js）。
 //
 //  ---- 欄位說明 ----
 //  id      ：唯一值，React key 用，隨意命名不影響顯示
@@ -17,17 +17,17 @@
 //  把陣列清空成 []，Enroll 頁會自動切換成「目前沒有開放報名」的空狀態版面。
 // ============================================================
 
-import workshopCover from "../assets/imgs/WorkList.jpg";
-import lectureCover from "../assets/imgs/leactureImg_1.jpg";
-import exhibitionCover from "../assets/imgs/ExhibitionBanner.webp";
+// 封面圖要先 import 進來，例：
+// import lectureCover from "../assets/imgs/lectureImg_1.webp";
+// import exhibitionCover from "../assets/imgs/ExhibitionBanner.webp";
 
-// ⚠️ 以下為範例資料，上線前請換成真實活動、或清空成 []
+// 目前沒有開放報名的活動。下面註解是填寫範例，取消註解並換成真實資料即可
 const enrolls = [
 	// {
 	// 	id: "2026-EN001",
 	// 	title: "設醮工作坊：從一張紙開始的敘事練習",
 	// 	date: "2026.09.12 (六)",
-	// 	cover: workshopCover,
+	// 	cover: lectureCover,
 	// 	formUrl: "https://forms.gle/",
 	// 	status: "open",
 	// },
