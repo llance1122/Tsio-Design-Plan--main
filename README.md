@@ -1,428 +1,241 @@
-# 設醮 Tsio Design Plan — 專案完整文件
+# 設醮 Tsio Design Plan
 
-> 設計活動形象網站，含**文章後台管理系統**。前端 React 單頁應用，後端 Express + SQLite，可用 Docker 一鍵部署。
->
-> 本文件整合原本的 **README**、**專案說明文件**、**文章後台操作手冊** 三份文件。
-> 原內容最後更新：2026-07-29　｜　整合於：2026-08-03
+長庚大學工業設計學系「設醮」計畫的形象網站。展覽、工作坊、講座等活動資訊，加上可以在後台即時發布的文章（報導）。
 
----
+> 「設」是設計，「醮」是面對創作時的虔誠與反省。設醮是一場屬於設計者的精神儀式。
 
-## 目錄
-
-**第一部：專案總覽**
-- [A1. 這是什麼](#a1-這是什麼)
-- [A2. 主要功能](#a2-主要功能)
-- [A3. 技術棧](#a3-技術棧)
-
-**第二部：技術與維護說明**
-1. [專案是什麼](#1-專案是什麼)
-2. [改造前的狀態](#2-改造前的狀態)
-3. [改造的目標與技術決策](#3-改造的目標與技術決策)
-4. [整體架構](#4-整體架構)
-5. [改造歷程（分階段）](#5-改造歷程分階段)
-6. [資料結構與 API](#6-資料結構與-api)
-7. [本機開發怎麼跑](#7-本機開發怎麼跑)
-8. [部署到 NAS（Docker）](#8-部署到-nasdocker)
-9. [目前的上線狀態](#9-目前的上線狀態)
-10. [日常維護](#10-日常維護)
-11. [安全注意事項](#11-安全注意事項)
-12. [尚未完成 / 待辦](#12-尚未完成--待辦)
-13. [檔案結構速查](#13-檔案結構速查)
-14. [Git 版本紀錄](#14-git-版本紀錄)
-
-**第三部：文章後台操作手冊（給發文者）**
-- [M1. 進入後台與登入](#m1-進入後台與登入)
-- [M2. 發布一篇新文章](#m2-發布一篇新文章)
-- [M3. 修改一篇已發布的文章](#m3-修改一篇已發布的文章)
-- [M4. 刪除一篇文章](#m4-刪除一篇文章)
-- [M5. 小提醒](#m5-小提醒)
+- 私人專案，僅供設醮團隊使用
+- 部署在系上 NAS 的 Docker（見 [部署與維護](docs/部署與維護.md)）
 
 ---
----
 
-# 第一部：專案總覽
+## 網站有哪些頁面
 
-## A1. 這是什麼
+| 網址 | 頁面 | 內容來源 |
+|---|---|---|
+| `/` | 首頁：主視覺輪播、公告、關於、照片牆、展覽、工作坊、計畫、最新報導 | 程式內容 ＋ 資料庫（最新報導） |
+| `/About` | 關於設醮 | 程式內容 |
+| `/Plan` | 計畫總覽（展覽、工作坊入口） | 程式內容 |
+| `/Plan/ExhibitionList` | 展覽總覽 | `exhibitions.json` |
+| `/Plan/ExhibitionList/2024-E001` | 「對話的對話」展覽內頁 | 程式內容 |
+| `/Plan/Workshop` | 工作坊介紹 | 程式內容 |
+| `/Plan/Workshop/List`、`/Plan/Workshop/:id` | 工作坊總覽、單一工作坊 | `workshops.json` |
+| `/Plan/Market`、`/Plan/Lecture`、`/Plan/Other` | 市集、講座、戶外電影（目前選單中隱藏） | 程式內容 |
+| `/Articles`、`/Articles/:slug` | 文章總覽、文章內頁 | 資料庫（後台發布） |
+| `/Enroll` | 報名參與 | `enrolls.js` |
+| `/Contact` | 聯絡我們 | 程式內容 |
+| `/admin` | 文章後台（密碼登入） | 資料庫 |
 
-一個設計系／設計活動的形象網站，內容包含展覽、工作坊、市集、講座、其他活動與**文章（報導）**。文章原本寫死在程式裡，現已改造成**可透過後台即時發布 / 編輯 / 刪除**，不需重新部署。
-
-技術上是一個 **單頁應用（SPA）**：使用者在瀏覽器裡切換頁面時不會整頁重新載入，由前端路由（react-router）決定顯示哪個頁面。
-
-## A2. 主要功能
-
-- 🎨 **前台**：首頁 Banner 視差輪播、視差圖庫、自適應顏色導覽列、各活動頁面
-- 📝 **文章後台 `/admin`**：密碼登入、結構化區塊編輯器（小標／段落自由排列）、海報上傳、新增／編輯／刪除
-- 🔌 **後端 API**：Express 提供文章 CRUD 與圖片上傳，JWT 登入驗證
-- 🗄️ **資料庫**：Node 24 內建 SQLite（免安裝、免編譯原生模組）
-- 🐳 **部署**：單一 Docker 容器同時服務前端 + API + 圖片
-
-## A3. 技術棧
+## 技術
 
 | 層 | 技術 |
 |---|---|
-| 前端 | Vite 7、React 19、react-router 7、Tailwind CSS v4 |
-| 後端 | Node.js 24、Express 4、`node:sqlite` |
-| 部署 | Docker、Synology NAS |
+| 前端 | React 19、**React Router 7（框架模式）**、Tailwind CSS v4、Vite 7 |
+| 後端 | Node.js 24、Express 4、SQLite（Node 內建 `node:sqlite`，免安裝） |
+| 部署 | 單一 Docker 容器（Synology NAS） |
 
-> 授權：私人專案，僅供設醮團隊使用。
+## 快速開始
 
----
----
-
-# 第二部：技術與維護說明
-
-> 本部記錄這個網站從「純前端靜態網站」改造成「前端 + 後端 + 後台管理 + Docker 部署」的完整過程、技術細節與維護方式。
-
-## 1. 專案是什麼
-
-「設醮 Tsio Design Plan」是一個設計活動的形象網站，內容包含展覽、工作坊、市集、講座、其他活動、以及**文章（報導）**等單元。技術上是一個**單頁應用（SPA）**，由前端路由（react-router）決定顯示哪個頁面。
-
-## 2. 改造前的狀態
-
-改造前，網站是**純前端**，所有文章資料寫在 `src/data/article.json` 裡，並且是用 `import` 的方式在**打包（build）時就寫死進程式**。
-
-這造成一個根本限制：
-
-> 想新增一篇文章，必須改原始碼 → 重新 build → 重新部署整包網站。沒有辦法「在網站上直接發文」。
-
-## 3. 改造的目標與技術決策
-
-**目標**：讓網站能有一個**後台**，可以輸入文章標題、內文、上傳海報來發布文章，不用每次都改程式重新部署。
-
-過程中做的幾個關鍵決策：
-
-| 決策點 | 選擇 | 原因 |
-|---|---|---|
-| 後端語言 | **Node.js**（不用 PHP） | 與前端 React 同一種語言（JavaScript），整個專案技術棧統一 |
-| 後端與前端的關係 | **獨立的 Express API**，保留現有 Vite React | 不用把現有網站重寫成 Next.js，工程量最小 |
-| 資料庫 | **SQLite**（Node 24 內建的 `node:sqlite`） | 單一檔案、免安裝資料庫服務、**免編譯原生模組**，Windows 與 Docker 都能跑 |
-| 內文編輯方式 | **結構化區塊編輯器** | 忠實對應原本文章「小標 + 多段落」交錯的結構 |
-| 部署方式 | **Docker 容器**，跑在 Synology NAS | 一個容器同時服務前端 + API + 圖片，好維護 |
-| 對外路徑 | **子路徑** `/tsio-design/` | NAS 上 Bloomberg 已佔用網站根目錄，用路徑分流 |
-
-## 4. 整體架構
-
-```
-                        瀏覽器 (使用者)
-                             │
-                             ▼
-      ┌─────────────────────────────────────────────┐
-      │   單一 Node.js (Express) 伺服器                │
-      │   全部掛在 /tsio-design 前綴下：                │
-      │                                               │
-      │   GET  /tsio-design/            → React 網站   │
-      │   GET  /tsio-design/api/articles → 讀文章      │
-      │   POST /tsio-design/api/articles → 發文(需登入) │
-      │   GET  /tsio-design/uploads/xxx  → 海報圖      │
-      │                     │                         │
-      │                  SQLite (data.db)             │
-      │                  uploads/ (海報圖檔)           │
-      └─────────────────────────────────────────────┘
-```
-
-- **前端**：Vite 7 + React 19 + react-router 7 + Tailwind CSS v4
-- **後端**：Express 4 + Node 24 內建 SQLite
-- **打包後**：前端變成靜態檔（`dist/`），由 Express 一起吐出去
-- 部署時整包裝進一個 **Docker 容器**
-
-## 5. 改造歷程（分階段）
-
-### Phase 1 — 後端骨架
-建立 `server/` 資料夾，用 Express 寫了一支後端：
-- 文章的**列表 / 單篇 / 新增 / 刪除 / 更新** API
-- **單一管理員密碼登入**，登入成功發一個 JWT token，之後發文都要帶這個 token
-- 使用 Node 24 內建 SQLite（免裝套件）
-- 寫了一支腳本 `import-articles.js`，把原本 `article.json` 的 8 篇文章匯入資料庫（**保留舊網址** `ALUM-A001` 等）
-
-### Phase 2 — 前端主站改抓 API
-把前端這幾個檔案從「`import` 打包死的 JSON」改成「即時 `fetch` 後端 API」：
-- 文章總覽頁、單篇文章頁、首頁「最新報導」區
-- 順手修掉 `CardLayout` 原本靠「id 字串內容」判斷型別的脆弱寫法，改用明確欄位
-- 加上「載入中 / 載入失敗 / 找不到文章」的狀態顯示
-
-### Phase 3 — `/admin` 後台
-做了一個獨立的後台頁面（不含主站的 Nav / Footer）：
-- 密碼登入，token 存在瀏覽器 localStorage
-- **發文表單**：標題、描述、日期、分類、上傳海報
-- **結構化區塊編輯器**：可以一塊一塊新增「小標」或「段落」、上下排序、刪除
-- 已發布文章列表，可**編輯**與**刪除**
-
-### 中途修正 — slug 乾淨化
-新文章的網址原本會用中文標題產生一長串編碼過的亂碼網址，改成乾淨的短代碼 `a-{id}`（例：`/Articles/a-9`）。舊 8 篇維持原本的 `ALUM-A00x`。
-
-### Nav 顏色問題 + Code Review
-- **Nav 標題消失問題**：原本 Nav 用 `mix-blend-difference`（差值混色），在**中灰色背景**（例如 Banner 照片，實測亮度 122）上，白色 logo 混色後也會變中灰、跟背景糊在一起看不見。
-  → 改成**自適應顏色**：偵測 Nav 下方是深色還是淺色區塊，自動切換白字或深色字（深色區塊 Banner、Footer 標記 `data-navcolor="white"`）。用 inline style 上色以避開 Tailwind 的樣式覆蓋問題。
-- **Code review 修掉的 bug**：
-  - Footer 兩個死連結（「最新消息」原本指向不存在的 `/News`、「展覽」指向不存在的 `/Plan/Exhibition`）
-  - 補完三個原本空白的頁面：404 頁、報名頁、單一工作坊頁（接工作坊資料）
-  - 幾處 `class=` 寫錯成 HTML 而非 `className=`、一個不合法的 `<button><Link>` 巢狀、殘留的亂碼 class
-
-### 統一佔位圖 + 文章編輯功能
-- **統一佔位圖**：文章沒有上傳海報時，列表卡片與內頁大圖退回**同一張**預設圖，消除「列表一張、內頁另一張」的錯覺。
-- **編輯功能**：後台每篇文章加「編輯」鈕，載入完整資料到表單，可修改標題 / 描述 / 日期 / 內文區塊 / 海報。更新時**保留原網址（slug 不變）**。
-
-### Phase 4 — 部署設定
-- 新增 `Dockerfile`（多階段建置）、`docker-compose.yml`、`.dockerignore`
-- 資料（SQLite + 上傳圖片）透過 `DATA_DIR` 環境變數指向掛載的 volume，重建容器不會遺失
-- 匯入腳本改為「資料庫已有文章就略過」，避免正式環境的資料被覆蓋
-
-### 子路徑部署
-因為 NAS 上只有一個對外入口、Bloomberg 已佔用網站根目錄，把整個網站改成掛在 `/tsio-design/` 子路徑下：
-- 前端 vite `base` 與 router `basename` 改為 `/tsio-design`
-- 後端用 `BASE_PATH` 環境變數，把所有路由（API / 圖片 / 靜態檔 / SPA fallback）都掛在這個前綴下
-- 新增 `src/lib/paths.js` 的 `url()`，讓所有 API 呼叫與海報網址自動接上這個前綴
-
-## 6. 資料結構與 API
-
-### 資料庫（SQLite）文章表 `articles`
-
-| 欄位 | 說明 |
-|---|---|
-| `id` | 自動編號（主鍵） |
-| `slug` | 網址用識別碼。舊文章沿用 `ALUM-A00x`，新文章是 `a-{id}` |
-| `title` | 標題 |
-| `description` | 摘要／描述 |
-| `date` | 日期（純文字，例：`04 08 2025`） |
-| `location` | 分類／標籤（例：`校友特稿`） |
-| `cover` | 海報圖網址（`/uploads/xxx`），可為空 |
-| `blocks` | 內文區塊，存成 JSON 字串 |
-| `created_at` | 建立時間，用於排序（新→舊） |
-
-**`blocks` 的格式**：一個陣列，每個元素是 `{ "type": "subtitle" 或 "paragraph", "content": "文字" }`。
-
-### API 端點（都在 `/tsio-design` 前綴下）
-
-| 方法 | 路徑 | 用途 | 需登入 |
-|---|---|---|---|
-| POST | `/api/login` | 管理員登入，回傳 token | ✗ |
-| GET | `/api/articles` | 文章列表（不含內文，省流量） | ✗ |
-| GET | `/api/articles/:slug` | 單篇文章（含內文區塊） | ✗ |
-| POST | `/api/articles` | 新增文章（可上傳海報） | ✓ |
-| PUT | `/api/articles/:id` | 更新文章（保留 slug，可換海報） | ✓ |
-| DELETE | `/api/articles/:id` | 刪除文章（連海報檔一起刪） | ✓ |
-
-## 7. 本機開發怎麼跑
-
-需要 Node.js（建議 24 以上）。
+需要 Node.js 24 以上。
 
 ```bash
-# 1. 安裝相依套件
-npm install
-
-# 2.（第一次）把現有文章匯入本機資料庫
-npm run import:articles
-
-# 3. 開後端（會讀 server/.env，跑在 3001 埠）
-npm run server:dev
-
-# 4. 另開一個終端機，開前端開發伺服器（跑在 5181 埠）
-npm run dev
+npm install              # 安裝套件
+npm run import:articles  # 第一次：把預設文章匯入本機資料庫
+npm run dev              # 啟動開發伺服器
 ```
 
-- 開發網址：`http://localhost:5181/tsio-design/`
-- 後台：`http://localhost:5181/tsio-design/admin`
-- **打包（產生 dist/）**：`npm run build`
+打開 `http://localhost:3001`，後台在 `http://localhost:3001/admin`（本機預設密碼 `admin1234`，可在 `server/.env` 修改，範本見 `server/.env.example`）。
 
-`server/.env`（本機設定，不會進 git）包含：`PORT`、`ADMIN_PASSWORD`、`JWT_SECRET`、`BASE_PATH`。
-
-## 8. 部署到 NAS（Docker）
-
-### 要放到 NAS 的檔案
-複製整個專案，但**不要**複製這些（會自動重建或屬於本機資料）：
-- `node_modules/`（Docker 會重裝）
-- `dist/`（Docker 會重建）
-- `.git/`、`server/.env`、`server/data.db`、`server/uploads/`
-
-⚠️ 專案資料夾**不要放在 `/volume1/web/`**（那是 Web Station 對外服務的目錄，會讓 `docker-compose.yml` 裡的密碼被人下載）。目前放在 `/volume1/web_packages/docker/Tsio-Design-Plan`。
-
-### 密碼設定（`.env`）
-密碼與密鑰放在專案資料夾的 `.env` 檔（**不進 git**，`git pull` 不會覆蓋）：
-```bash
-cp .env.example .env    # 再編輯 .env 填入正式值
-```
-- `ADMIN_PASSWORD`：後台登入密碼
-- `JWT_SECRET`：一長串隨機字元（`openssl rand -hex 32`）
-
-`docker-compose.yml` 其他設定已固定、不用動：`BASE_PATH=/tsio-design`、`DATA_DIR=/data` + volume `./data:/data`、埠對應 `8080:3001`。
-
-### 部署步驟（Synology Container Manager）
-1. 在專案資料夾裡先建一個 **`data`** 資料夾（Docker 掛載需要它先存在）。
-2. Container Manager → 專案 → 新增 → 路徑選專案資料夾 → 來源選「使用現有的 docker-compose.yml」。
-3. 建置（第一次會下載 Node、裝套件、打包前端，需幾分鐘）。
-4. 狀態變「執行中」後，區網測試 `http://<NAS_IP>:8080/tsio-design/`。
-
-**日後更新網站**：把新程式碼覆蓋上去（或 `git pull`），Container Manager 對該專案重新「建置」即可。資料（`data/`）不受影響。
-
-## 9. 目前的上線狀態
-
-- 容器已在 NAS 上執行，NAS 的公開 IP 是 `120.126.18.18`，且 **8080 埠對外是通的**。
-- **目前可公開連線的網址**：`http://120.126.18.18:8080/tsio-design/`
-- ⚠️ 這是 **HTTP（未加密）**。測試瀏覽沒問題，但**後台登入的密碼會以明文傳輸**，正式使用前應加上 HTTPS。
-- **加 HTTPS 的方式（尚未做）**：用 DSM 內建反向代理，在另一個 HTTPS 埠（例如 8443）→ `localhost:8080`；或等之後套上自己的網域，用反向代理搭配正式憑證。
-
-## 10. 日常維護
-
-- **新增／編輯／刪除文章**：直接用後台 `/tsio-design/admin`，不用碰程式（詳見第三部操作手冊）。
-- **資料備份**：備份 NAS 上專案資料夾裡的 **`data/`**（裡面是 `data.db` 資料庫與 `uploads/` 海報圖）。這是唯一存放使用者資料的地方。
-- **更新程式**：在 NAS 專案資料夾 `git pull` 抓 GitHub 最新 → Container Manager 重新建置。`.env` 與 `data/` 不受影響。
-- **換部署路徑**：若要改子路徑或改成根目錄，需同時改兩處 —— `vite.config.js` 的 `base` 與 `docker-compose.yml` 的 `BASE_PATH`（兩者要一致）。
-
-## 11. 安全注意事項
-
-- **一定要設定密碼**：`ADMIN_PASSWORD` 與 `JWT_SECRET`（在 NAS 專案資料夾的 `.env`）。網站已對外公開。
-- **目前是 HTTP 明文**：後台登入前建議先加 HTTPS（見第 9 節），否則密碼有被攔截風險。
-- **專案資料夾別放在 `/volume1/web/`**：避免 `docker-compose.yml`（含密碼）被公開下載。
-- `server/.env`、`data.db`、上傳圖檔都已被 `.gitignore` / `.dockerignore` 排除，不會進版控或 image。
-
-## 12. 尚未完成 / 待辦
-
-- **HTTPS**：加內建反向代理或套自己的網域（目前是 HTTP）。
-- **首頁分頁標題**：`index.html` 的 `<title>` 還是預設的「Vite + React」、`lang="en"`、favicon 是 Vite 圖示 —— 正式上線前建議改成網站自己的。
-- **重複的硬編碼內容**：市集、講座、其他活動、工作坊等頁面有大量複製貼上的重複區塊與 `Lorem ipsum` 假文，建議之後也資料化（像文章一樣可後台管理）。
-- **聯絡頁社群連結**：ContactPage 的 Instagram／Threads 連結還是佔位字串，要填實際網址。
-- **既有 8 篇文章沒有各自的海報**：匯入時沒有圖，目前都用預設佔位圖；可在後台逐篇編輯補上。
-- **套件弱點**：`npm install` 有回報一些相依套件弱點，尚未處理（避免動到現有前端版本）。
-
-## 13. 檔案結構速查
-
-```
-Tsio-Design-Plan/
-├─ server/                    ★ 後端（Node + Express + SQLite）
-│  ├─ index.js                 Express 入口（掛在 BASE_PATH 前綴下）
-│  ├─ config.js                設定（埠、密碼、路徑、BASE_PATH、DATA_DIR）
-│  ├─ db.js                    SQLite 連線與建表
-│  ├─ auth.js                  密碼驗證與 JWT
-│  ├─ routes/articles.js       文章 API（列表/單篇/新增/更新/刪除 + 海報上傳）
-│  ├─ import-articles.js       首次把 8 篇文章匯入資料庫
-│  ├─ .env                     本機設定（不進 git）
-│  └─ data.db、uploads/        本機的資料庫與上傳圖（不進 git）
-│
-├─ src/                       ★ 前端（React）
-│  ├─ main.jsx                 進入點：路由設定、掛載 App
-│  ├─ App.jsx / App.css        版面外框（Nav + 內容 + Footer）與全站樣式
-│  ├─ admin/                   後台（登入、發文/編輯表單、文章管理、API 呼叫）
-│  ├─ index_component/         首頁各區塊（Nav、Banner、Footer、About、Article…）
-│  ├─ routers/                 各頁面（文章、關於、報名、聯絡、404）
-│  │  └─ PlanFolder/           「計畫」底下的活動頁（展覽、工作坊、市集、講座…）
-│  ├─ small_component/         跨頁共用小元件（卡片、標題、麵包屑、更多連結…）
-│  ├─ hooks/                   自訂 React hook（進場動畫 useScrollReveal）
-│  ├─ lib/paths.js             把 API／圖片網址接上子路徑 base 的小工具
-│  ├─ config/                  設計參數（motion 動畫、spacing 間距）
-│  ├─ data/                    活動用的本地 JSON（工作坊、展覽）＋文章匯入來源
-│  └─ assets/                  圖片素材
-│     ├─ banner/               首頁 Banner（desktop / mobile / tablet 三種尺寸）
-│     ├─ icons/                UI 圖示（logo.svg、社群、箭頭…）
-│     ├─ imgs/                 頁面內容示意圖（文章封面、展覽、講座…）
-│     ├─ photos/               首頁區塊用的照片（About、圖庫、工作坊、計畫）
-│     ├─ bg_gray.jpg           灰底背景紋理
-│     └─ logo_footer.png       Footer 用的 logo
-│
-├─ Dockerfile                 容器建置（多階段）
-├─ docker-compose.yml         部署設定（密碼、埠、volume、BASE_PATH）
-├─ .dockerignore / .gitignore 排除清單
-├─ vite.config.js             前端 base 與開發代理
-├─ eslint.config.js           程式碼檢查規則
-├─ package.json               相依套件與指令
-└─ README.md                   本說明文件（含操作手冊）
-```
-
-## 14. Git 版本紀錄
-
-專案已用 git 版控，每個階段都有一個 commit，隨時可還原：
-
-| Commit | 內容 |
+| 指令 | 用途 |
 |---|---|
-| Initial commit | 改造前的原始狀態（還原點） |
-| Phase 1 | 後端骨架（Express + node:sqlite） |
-| Phase 2 | 前端主站改抓後端 API |
-| Phase 3 | `/admin` 後台（登入 + 結構化區塊發文 + 管理） |
-| slug | 新文章改用乾淨短代碼 `a-{id}` |
-| Nav + bugfix | Nav 自適應顏色 + code review 修正 |
-| 統一佔位圖 + 編輯 | 佔位圖統一 + 後台文章編輯功能 |
-| Phase 4 | Docker 部署設定 |
-| 子路徑 | 改為 `/tsio-design` 子路徑部署 |
-
-查看完整紀錄：`git log --oneline`
+| `npm run dev` | 開發模式：網站 + API 同一個伺服器，前端存檔即時更新（改後端程式要重啟） |
+| `npm run build` | 打包到 `build/` |
+| `npm start` | 用正式模式執行打包結果 |
+| `npm run lint` | 程式碼檢查 |
+| `npm run optimize:images` | 壓縮 `src/assets` 裡新加的照片 |
 
 ---
+
+## 網站怎麼運作
+
+```
+瀏覽器 ──► Node.js 伺服器（Express，server/index.js）
+             ├─ 內容固定的頁面（關於、計畫、展覽…）→ 送出打包時就產生好的 HTML
+             ├─ 內容來自資料庫的頁面（首頁、文章）  → 伺服器即時產生 HTML
+             ├─ /api/…      → 登入、文章新增／修改／刪除（後台用）
+             └─ /uploads/…  → 後台上傳的海報圖
+                                 │
+                        SQLite 資料庫 ＋ 海報圖資料夾
+```
+
+- **每一頁送出去的都是完整 HTML**：搜尋引擎與 LINE / FB 分享預覽都讀得到內容。JavaScript 載入後只負責互動（輪播、選單、捲動動畫）。
+- **文章**存在資料庫，在後台發文後，首頁與文章頁**立刻**就是最新內容，不用重新部署。
+- **其他內容**（展覽、工作坊、活動頁文案）寫在程式與 JSON 裡，修改後要重新打包部署。
+
+細節（頁面產生方式、資料流、API、寫程式的注意事項）見 [技術說明](docs/技術說明.md)。
+
 ---
 
-# 第三部：文章後台操作手冊（給發文者）
+## 專案結構與每個檔案的作用
 
-> 這份手冊教你如何在網站後台**發布、修改、刪除文章**。不需要任何程式知識，照著做即可。
+### 根目錄
 
-## M1. 進入後台與登入
+| 檔案 | 作用 |
+|---|---|
+| `package.json` / `package-lock.json` | 套件清單與指令（`dev`、`build`、`start`…） |
+| `react-router.config.js` | 哪些頁面在打包時預先產生 HTML、網站子路徑、輸出位置 |
+| `vite.config.js` | 打包設定：React Router、Tailwind、分享預覽圖（圖片加 `?og` 自動裁切） |
+| `eslint.config.js` | 程式碼檢查規則 |
+| `Dockerfile` | 容器建置：先打包網站，再用 Node 24 執行伺服器 |
+| `docker-compose.yml` | NAS 部署設定：對外 8080 埠、`data/` 資料夾、從 `.env` 讀密碼與子路徑 |
+| `.env.example` | NAS 用設定範本（後台密碼、登入密鑰、子路徑） |
+| `.gitignore` / `.dockerignore` | 不進版控／不進容器的檔案 |
+| `.claude/launch.json` | Claude Code 預覽用的啟動設定 |
+| `scripts/optimize-images.js` | 圖片壓縮工具：縮圖、jpg／png 轉 webp |
+| `docs/` | 其他文件（見最下方「文件」） |
 
-1. 打開瀏覽器，輸入後台網址：**`<網站網址>/tsio-design/admin`**
-   （例如：`http://120.126.18.18:8080/tsio-design/admin`）
-2. 在畫面中央的框框輸入**管理員密碼**，按「登入」。
-3. 登入成功後，會看到上方的「發布新文章」表單，以及下方「已發布文章」的清單。
+### `server/` — 後端
 
-> 💡 登入狀態會記住一段時間，之後回來通常不用重新登入。若被登出，重新輸入密碼即可。
+| 檔案 | 作用 |
+|---|---|
+| `index.js` | 伺服器入口：API、上傳圖、網頁（送出預先產生的頁面或即時產生）；開發模式時掛上 Vite |
+| `env.js` | 讀取 `server/.env`，整理網站子路徑 `BASE_PATH`（前端打包設定也共用這支） |
+| `config.js` | 設定：埠號、後台密碼、登入密鑰、資料庫與上傳資料夾位置 |
+| `db.js` | 連接 SQLite 資料庫、建立文章資料表 |
+| `articles.js` | 文章查詢（列表、單篇），API 與網頁共用 |
+| `auth.js` | 後台密碼驗證、登入憑證（JWT）、登入失敗次數限制 |
+| `routes/articles.js` | 文章 API：列表、單篇、新增、修改、刪除，海報上傳 |
+| `import-articles.js` | 第一次啟動時把 `src/data/article.json` 匯入資料庫 |
+| `.env.example` | 本機設定範本 |
+| `uploads/` | 後台上傳的海報圖（實際檔案不進 git） |
 
-## M2. 發布一篇新文章
+### `src/` — 網站外框與設定
 
-在上方「**發布新文章**」表單裡填寫：
+| 檔案 | 作用 |
+|---|---|
+| `root.jsx` | 整份 HTML 的外框：`<head>`、樣式、動畫與間距參數、錯誤畫面 |
+| `routes.js` | **路由表**：哪個網址對應哪個頁面檔 |
+| `App.jsx` | 主站版面：Nav ＋ 頁面內容 ＋ Footer，並啟用全站捲動進場動畫 |
+| `App.css` | 全站樣式：Tailwind、字級、換頁與捲動動畫 |
+| `config/site.js` | 網站名稱、正式網域、預設描述 |
+| `config/motion.js` | 動畫參數：時長、曲線、輪播間隔、進場效果 |
+| `config/spacing.js` | 區塊間距：標題到內文的距離（手機／平板／桌機） |
+| `lib/paths.js` | `url()`：把 API、上傳圖網址接上網站子路徑 |
+| `lib/articles.js` | 文章連結與封面（沒有海報時用預設圖） |
+| `lib/meta.js` | `pageMeta()`：產生每頁的描述與分享預覽資訊 |
+| `hooks/useScrollReveal.js` | 捲動進場：帶 `.headline` 的元素捲進畫面時淡入 |
 
-### 1. 基本欄位
-| 欄位 | 說明 | 必填 |
+### `src/index_component/` — 首頁與全站共用區塊
+
+| 檔案 | 作用 |
+|---|---|
+| `Main.jsx` | **首頁**：依序組合下面各區塊，並在伺服器端讀最新 3 篇文章 |
+| `Nav.jsx` | 導覽列（全站）：字色依背景自動切換、Plan 下拉選單、手機側邊選單 |
+| `Footer.jsx` | 頁尾（全站）：聯絡資訊、網站連結、社群、回到頂部 |
+| `Banner.jsx` | 首頁主視覺輪播（桌機左右兩欄擦入，手機／平板單欄） |
+| `Marquee.jsx` | 跑馬燈公告（改公告文字就改這支的 `MESSAGE`） |
+| `About.jsx` | 首頁「設醮」介紹段落 |
+| `ImageGallery.jsx` | 首頁視差照片牆與置中標語 |
+| `Exhibition.jsx` | 首頁展覽區塊（主視覺海報） |
+| `WorkShop.jsx` | 首頁工作坊區塊 |
+| `Plan.jsx` | 首頁計畫區塊 |
+| `Article.jsx` | 首頁「報導」區塊（手機輪播、桌機三欄） |
+
+### `src/routers/` — 首頁以外的頁面（一個檔案 = 一個網址）
+
+| 檔案 | 網址 |
+|---|---|
+| `AboutPage.jsx` | `/About` 關於設醮 |
+| `PlanPage.jsx` | `/Plan` 計畫總覽 |
+| `EnrollPage.jsx` | `/Enroll` 報名參與 |
+| `ContactPage.jsx` | `/Contact` 聯絡我們 |
+| `ArticlesPage.jsx` | `/Articles` 文章總覽 |
+| `SingleArticlePage.jsx` | `/Articles/:slug` 文章內頁 |
+| `NotFoundPage.jsx` | 找不到頁面（404） |
+| `PlanFolder/ExhibitionListPage.jsx` | `/Plan/ExhibitionList` 展覽總覽 |
+| `PlanFolder/exhibitions/2024-E001.jsx` | `/Plan/ExhibitionList/2024-E001` 「對話的對話」展覽內頁（每檔展覽一個檔，檔名 = 展覽 id） |
+| `PlanFolder/WorkshopPage.jsx` | `/Plan/Workshop` 工作坊介紹 |
+| `PlanFolder/WorkshopListPage.jsx` | `/Plan/Workshop/List` 工作坊總覽 |
+| `PlanFolder/SingleWorkshopPage.jsx` | `/Plan/Workshop/:id` 單一工作坊（內容來自 `workshops.json`） |
+| `PlanFolder/MarketPage.jsx` | `/Plan/Market` 市集 |
+| `PlanFolder/LecturePage.jsx` | `/Plan/Lecture` 講座 |
+| `PlanFolder/OtherActivitiesPage.jsx` | `/Plan/Other` 戶外電影 |
+
+### `src/small_component/` — 跨頁共用的小元件
+
+| 檔案 | 作用 |
+|---|---|
+| `CardLayout.jsx` | 列表卡片（文章、展覽、工作坊共用） |
+| `Title.jsx` | 區塊標題（直式／橫式） |
+| `Breadcrumbs.jsx` | 麵包屑導覽 |
+| `MoreLink.jsx` | 「查看更多」按鈕 |
+| `PageTransition.jsx` | 換頁時整頁淡入 |
+| `CrossfadeImages.jsx` | 多張圖輪流淡入（手機版圖庫） |
+| `ProfileCard.jsx` | 講者／電影介紹卡片 |
+| `ExhibitionCard.jsx` | 計畫頁的活動大卡片 |
+| `EnrollCard.jsx` | 報名活動卡片（報名中／額滿／截止） |
+| `ContactInfoItem.jsx` | 頁尾的一行聯絡資訊 |
+
+### `src/admin/` — 文章後台
+
+| 檔案 | 作用 |
+|---|---|
+| `AdminApp.jsx` | 後台入口：未登入顯示登入頁，登入後顯示管理面板 |
+| `LoginForm.jsx` | 密碼登入畫面 |
+| `Dashboard.jsx` | 已發布文章列表：編輯、刪除 |
+| `ArticleForm.jsx` | 發文／編輯表單：標題、描述、海報、小標與段落區塊 |
+| `api.js` | 呼叫後台 API、保存登入狀態 |
+
+### `src/data/` — 網站資料
+
+| 檔案 | 作用 |
+|---|---|
+| `exhibitions.json` | 展覽資料（`cover` 填 `assets/imgs/` 的檔名） |
+| `workshops.json` | 工作坊資料（目前是空的） |
+| `enrolls.js` | 報名活動清單（目前是空的，檔內附填寫範例） |
+| `covers.js` | 把 JSON 裡的封面檔名對應成圖片網址 |
+| `article.json` | 最初的 8 篇文章，只在第一次啟動時匯入資料庫 |
+
+### `src/assets/` — 圖片
+
+| 資料夾 | 內容 |
+|---|---|
+| `banner/` | 首頁主視覺（`desktop/` 左右兩欄、`mobile/`、`tablet/` 整張圖） |
+| `photos/` | 首頁與關於頁的照片 |
+| `imgs/` | 各頁內容圖、封面、預設封面 |
+| `dialoguesPhotos/` | 「對話的對話」展覽的參展人照片 |
+| `og/` | 置中裁切不適用時，另存的分享預覽圖 |
+| `icons/` | Logo、社群圖示、箭頭 |
+| `bg_gray.webp` | 灰底背景紋理 |
+
+打包與執行時才會出現的資料夾（都不進版控）：`node_modules/`（套件）、`build/`（打包結果）、`.react-router/`（自動產生的型別）、`server/data.db`（本機資料庫）。
+
+---
+
+## 常見維護工作要改哪個檔案
+
+| 要做的事 | 改哪裡 |
+|---|---|
+| 改某一頁的文字、圖片 | 該頁的頁面檔（對照上面的表或 `src/routes.js` 找） |
+| 改 Nav 選單、Footer | `src/index_component/Nav.jsx`、`Footer.jsx` |
+| 改某頁的分享標題、描述、預覽圖 | 該頁面檔最上方的 `meta` |
+| 新增、修改、刪除文章 | 後台 `/admin`，不用改程式（見 [後台操作手冊](docs/後台操作手冊.md)） |
+| 新增一個頁面 | 新增頁面檔 → `src/routes.js` 加一行；內容固定的頁面再加進 `react-router.config.js` 的 `STATIC_PAGES` |
+| 新增一檔展覽 | `src/data/exhibitions.json` 加一筆 ＋ 新增 `src/routers/PlanFolder/exhibitions/<展覽id>.jsx` |
+| 新增一個工作坊 | `src/data/workshops.json` 加一筆 |
+| 開放／關閉報名 | `src/data/enrolls.js` |
+| 改跑馬燈公告 | `src/index_component/Marquee.jsx` 的 `MESSAGE` |
+| 調整動畫快慢、區塊間距 | `src/config/motion.js`、`spacing.js` |
+| 改網站名稱、正式網域 | `src/config/site.js` |
+| 新增照片 | 放進 `src/assets` 後執行 `npm run optimize:images` |
+
+---
+
+## 文件
+
+| 文件 | 給誰看 | 內容 |
 |---|---|---|
-| **標題** | 文章標題 | ✅ 必填 |
-| **摘要／描述** | 一兩句話的簡介，會顯示在文章列表 | 選填 |
-| **日期** | 例如 `2026 07 29` | 選填 |
-| **分類／標籤** | 例如 `校友特稿` | 選填 |
-| **海報圖** | 文章的封面／主圖，點「選擇檔案」上傳一張圖片 | 選填 |
-
-### 2. 撰寫內文（重點）
-內文是用「一塊一塊」的方式組合的。右上角有兩個按鈕：
-
-- **＋ 小標**：新增一個「小標題」區塊（用來分段落主題，字比較大）
-- **＋ 段落**：新增一個「內文段落」區塊（一般文字）
-
-每新增一塊，下面就會出現一個文字框讓你打字。你可以：
-- **上下箭頭**：調整這一塊的順序
-- **刪除**：移除這一塊
-
-> 📝 **範例**：一篇文章通常是這樣組合的
-> ```
-> [小標] 專訪｜從產品設計到創業
-> [段落] 第一段內文……
-> [段落] 第二段內文……
-> [小標] 給年輕設計師的建議
-> [段落] 又一段內文……
-> ```
-> 想加幾塊就加幾塊，順序自由排列。
-
-### 3. 送出
-確認都填好後，按最下面的「**發布文章**」。
-成功會出現「發布成功！」，新文章立刻出現在下方清單最上面，網站前台也馬上看得到。
-
-## M3. 修改一篇已發布的文章
-
-1. 在下方「已發布文章」清單，找到要改的那篇，點它右邊的「**編輯**」。
-2. 該篇的所有內容會自動帶入上方表單（標題、內文區塊都會出現）。
-3. 直接修改你要改的地方。
-4. **海報**：如果不想換圖，就不要選新檔，原本的圖會保留；想換就上傳新的。
-5. 改完按「**更新文章**」。出現「已更新！」就完成了。
-
-> 💡 修改文章**不會改變它的網址**，原本分享出去的連結仍然有效。
-> 想放棄修改，按「取消編輯」回到發布新文章模式。
-
-## M4. 刪除一篇文章
-
-1. 在清單找到那篇，點右邊的「**刪除**」。
-2. 會跳出確認視窗，按「確定」。
-
-> ⚠️ **刪除無法復原**，連同它的海報圖也會一起刪掉，刪之前請確認。
-
-## M5. 小提醒
-
-- **內文的空白區塊會自動忽略**：如果新增了區塊卻沒打字，送出時會自動略過，不用特地刪。
-- **海報圖建議用橫式**：文章卡片與內頁大圖是橫式比例，橫式圖片顯示效果最好。
-- **沒有上傳海報**也可以發文，系統會用一張預設的封面圖。
-- **登出**：右上角有「登出」按鈕，在公用電腦操作完記得登出。
-
----
-
-有任何操作上的問題，或想調整後台的功能（例如增加欄位、分類管理等），再找工程人員協助即可。
+| [後台操作手冊](docs/後台操作手冊.md) | 發文的同學 | 登入、發文、修改、刪除文章（不需要程式知識） |
+| [部署與維護](docs/部署與維護.md) | 負責 NAS 的人 | Docker 部署、密碼設定、更新、備份、安全、待辦事項 |
+| [技術說明](docs/技術說明.md) | 接手開發的工程師 | 頁面產生方式、資料與 API、子路徑、寫程式的注意事項 |
+| [開發紀錄](docs/開發紀錄.md) | 想了解來龍去脈的人 | 改造歷程、技術決策、版本紀錄 |
