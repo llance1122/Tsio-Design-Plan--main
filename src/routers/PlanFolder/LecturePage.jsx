@@ -3,22 +3,13 @@ import Breadcrumbs from "../../small_component/Breadcrumbs";
 import ProfileCard from "../../small_component/ProfileCard";
 import Title from "../../small_component/Title";
 import CrossfadeImages from "../../small_component/CrossfadeImages";
+import useMediaQuery, { BREAKPOINTS } from "../../hooks/useMediaQuery";
 
 import lectureSpeaker_1 from "../../assets/imgs/lectureSpeaker_1.webp";
 import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
 import lectureImg_1 from "../../assets/imgs/lectureImg_1.webp";
 import lectureImg_2 from "../../assets/imgs/lectureImg_2.webp";
 import lectureImg_3 from "../../assets/imgs/lectureImg_3.webp";
-import { pageMeta } from "../../lib/meta";
-import ogImage from "../../assets/imgs/lectureImg_1.webp?og";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "講座",
-		description: "邀請走過這條路的前輩，談創作背後那段無聲的過程。",
-		image: ogImage,
-		location,
-	});
 
 // ============================================================
 //  講座頁的內容資料：要換講者、場次，改下面兩個陣列即可
@@ -143,22 +134,15 @@ export default function LecturePage() {
 	);
 }
 
-// 頂部圖庫：手機輪流淡入，平板以上（md）左一大、右兩小。
-// 兩種版型都輸出、用 CSS 切換，伺服器產生的 HTML 在任何螢幕寬度都直接是對的版型
+// 頂部圖庫：手機輪流淡入，平板以上左一大、右兩小
 const ImageGallery = () => {
 	const images = [lectureImg_1, lectureImg_2, lectureImg_3];
+	const isMobile = useMediaQuery(BREAKPOINTS.mobile);
+
+	if (isMobile) return <CrossfadeImages images={images} />;
 
 	return (
-		<>
-			<CrossfadeImages images={images} className="w-full aspect-video md:hidden" />
-			<DesktopGallery images={images} />
-		</>
-	);
-};
-
-const DesktopGallery = ({ images }) => {
-	return (
-		<div className="w-full aspect-video hidden md:flex">
+		<div className="w-full aspect-video flex">
 			<div className="w-[50%] h-full">
 				<img className="h-full w-full object-cover" src={images[0]} alt="" />
 			</div>

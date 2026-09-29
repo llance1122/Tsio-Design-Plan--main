@@ -3,16 +3,12 @@ import CrossfadeImages from "../small_component/CrossfadeImages";
 import AboutPage_1 from "../assets/photos/AboutPage_1.webp";
 import AboutPage_2 from "../assets/photos/AboutPage_2.webp";
 import AboutPage_3 from "../assets/photos/AboutPage_3.webp";
-import { pageMeta } from "../lib/meta";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "關於設醮",
-		description: "「設」是設計，「醮」是面對創作時的虔誠與反省。設醮是一場屬於設計者的精神儀式。",
-		location,
-	});
+import useScrollReveal from "../hooks/useScrollReveal";
+import useMediaQuery, { BREAKPOINTS } from "../hooks/useMediaQuery";
 
 export default function AboutPage() {
+	useScrollReveal();
+
 	return (
 		<section className="space-y-[20vh]">
 			<main className="space-y-[10vh] mt-[15vh] lg:space-y-[20vh] lg:mt-[24vh]">
@@ -74,22 +70,15 @@ export default function AboutPage() {
 	);
 }
 
-// 頂部圖庫：手機與平板輪流淡入，桌機（lg 以上）三張並排。
-// 兩種版型都輸出、用 CSS 切換，伺服器產生的 HTML 在任何螢幕寬度都直接是對的版型
+// 頂部圖庫：手機與平板輪流淡入，桌機三張並排
 const ImageGallery = () => {
 	const images = [AboutPage_1, AboutPage_2, AboutPage_3];
+	const isMobile = useMediaQuery(BREAKPOINTS.tabletDown);
+
+	if (isMobile) return <CrossfadeImages images={images} />;
 
 	return (
-		<>
-			<CrossfadeImages images={images} className="w-full aspect-video lg:hidden" />
-			<DesktopGallery images={images} />
-		</>
-	);
-};
-
-const DesktopGallery = ({ images }) => {
-	return (
-		<div className="hidden lg:flex gap-[5px] lg:h-[62vh] mx-auto ">
+		<div className="flex gap-[5px] h-[68vh] lg:h-[62vh] mx-auto ">
 			<div className="grow-1 basis-0 h-full">
 				<img className="w-full h-full object-cover" src={images[0]} alt="" />
 			</div>

@@ -3,6 +3,8 @@
 // ============================================================
 import { url } from "../lib/paths";
 
+// 讀取文章與前台共用同一份實作
+export { fetchArticles, fetchArticle } from "../lib/articles";
 
 const TOKEN_KEY = "tsio_admin_token";
 
@@ -30,19 +32,6 @@ export async function login(password) {
 	const { token } = await r.json();
 	setToken(token);
 	return token;
-}
-
-export async function fetchArticles() {
-	const r = await fetch(url("/api/articles"));
-	if (!r.ok) throw new Error("讀取失敗");
-	return r.json();
-}
-
-// 取單篇完整資料（含內文區塊），用於編輯時帶入表單
-export async function fetchArticle(slug) {
-	const r = await fetch(url(`/api/articles/${slug}`));
-	if (!r.ok) throw new Error("讀取文章失敗");
-	return r.json();
 }
 
 // 需要登入的請求：自動帶 token；401 時清掉 token，讓畫面回到登入頁

@@ -1,3 +1,5 @@
+import useMediaQuery, { BREAKPOINTS } from "../hooks/useMediaQuery";
+
 /**
  * 通用的 Profile/Content 卡片元件
  * @param {string} size - 圖片在 lg 斷點時的寬度 (例如 '400px')
@@ -8,7 +10,12 @@
  * @param {string} variant - 卡片變體：'movie' 為電影模式，未設定則為預設講師模式
  */
 export default function ProfileCard({ size, src, name, job, content, variant }) {
+	const isLg = useMediaQuery(BREAKPOINTS.lg);
+	const isMd = useMediaQuery(BREAKPOINTS.md);
 	const isMovieVariant = variant === "movie";
+
+	// 圖片寬度：lg 用傳入的 size、md 固定 300px、手機滿版
+	const imageWidth = isLg ? size : isMd ? "300px" : "100%";
 
 	const titleClassName = isMovieVariant
 		? "subtitle-bold lg:subtitle-bold-web" // 電影標題更大
@@ -16,12 +23,7 @@ export default function ProfileCard({ size, src, name, job, content, variant }) 
 
 	return (
 		<div className="space-y-[35px] flex flex-col md:flex-row md:justify-center md:items-center md:space-x-[70px] md:space-y-0">
-			{/* 圖片寬度：手機滿版、md 固定 300px、lg 用傳入的 size。
-			    寬度交給 CSS 斷點處理（size 透過 CSS 變數傳入），伺服器產生的 HTML 不必等 JS 量螢幕 */}
-			<div
-				className="w-full aspect-square md:w-[300px] lg:w-[var(--card-img-w)]"
-				style={{ "--card-img-w": size }}
-			>
+			<div className="w-full" style={{ aspectRatio: "1 / 1", width: imageWidth }}>
 				<img
 					className="w-full h-full object-cover"
 					src={src}

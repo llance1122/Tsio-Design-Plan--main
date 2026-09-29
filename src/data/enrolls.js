@@ -2,7 +2,7 @@
 //  報名活動資料（Enroll 頁）
 //
 //  用 .js 而不是 .json，是為了能寫註解、也能直接 import 封面圖，
-//  不必像 workshops.json 那樣用檔名去對應（見 data/covers.js）。
+//  不必像 workshops.json 那樣再繞一層 imagesObjects 對照表。
 //
 //  ---- 欄位說明 ----
 //  id      ：唯一值，React key 用，隨意命名不影響顯示

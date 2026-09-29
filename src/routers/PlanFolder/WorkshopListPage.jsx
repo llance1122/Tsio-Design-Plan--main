@@ -1,13 +1,7 @@
 import workshopsData from "../../data/workshops.json";
-import { coverUrl } from "../../data/covers";
-import { pageMeta } from "../../lib/meta";
-// 橫幅很寬，自動置中裁切會切到文字，改用另存的裁好版本（src/assets/og/）
-import ogImage from "../../assets/og/workshop_banner-og.webp?og";
+import { workshopImages } from "../../data/imagesObjects";
 import CardLayout from "../../small_component/CardLayout";
 import Breadcrumbs from "../../small_component/Breadcrumbs";
-
-export const meta = ({ location }) =>
-	pageMeta({ title: "工作坊總覽", image: ogImage, location });
 
 export default function WorkshopListPage() {
 	return (
@@ -20,7 +14,7 @@ export default function WorkshopListPage() {
 						<CardLayout
 							key={workshop.id}
 							to={`/Plan/Workshop/${workshop.id}`}
-							image={coverUrl(workshop.cover)}
+							image={workshopImages[workshop.id]}
 							title={workshop.title}
 							date={workshop.date}
 						/>

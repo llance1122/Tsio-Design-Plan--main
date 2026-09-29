@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'build', '.react-router']),
+  globalIgnores(['dist']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -25,16 +25,11 @@ export default defineConfig([
     rules: {
       // 大寫開頭的變數／參數多半是只在 JSX 裡使用的元件（如 <Icon />），核心規則看不到 JSX 用法
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^[A-Z_]' }],
-      // 頁面檔除了元件，還會匯出 React Router 規定的 meta、loader 等，這些不影響熱更新
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowExportNames: ['meta', 'links', 'loader', 'headers', 'Layout', 'ErrorBoundary', 'HydrateFallback'] },
-      ],
     },
   },
   {
     // Node 環境：後端與建置設定檔（使用 process / Buffer 等 Node 全域）
-    files: ['server/**/*.js', 'scripts/**/*.js', 'vite.config.js', 'react-router.config.js'],
+    files: ['server/**/*.js', 'scripts/**/*.js', 'vite.config.js'],
     languageOptions: {
       globals: globals.node,
     },

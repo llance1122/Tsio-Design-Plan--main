@@ -5,16 +5,6 @@ import Title from "../../small_component/Title";
 import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
 import movieCover_1 from "../../assets/imgs/movieCover_1.webp";
 import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
-import { pageMeta } from "../../lib/meta";
-import ogImage from "../../assets/imgs/movieCover_1.webp?og";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "戶外電影",
-		description: "一塊幕布、一片星空，戶外電影帶你走進被影像喚醒的記憶。",
-		image: ogImage,
-		location,
-	});
 
 // ============================================================
 //  戶外電影片單：要換片改這個陣列即可

@@ -2,22 +2,30 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dev",
+      "name": "api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev"
-      ],
+      "runtimeArgs": ["run", "server:dev"],
       "port": 3001,
       "autoPort": false
     },
     {
-      "name": "start",
+      "name": "vite-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "start"
-      ],
-      "port": 3001,
+      "runtimeArgs": ["run", "dev", "--", "--port", "5181", "--strictPort"],
+      "port": 5181,
+      "autoPort": false
+    },
+    {
+      "name": "vite-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview"],
+      "port": 4173
+    },
+    {
+      "name": "dist-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "4180", "--directory", "dist"],
+      "port": 4180,
       "autoPort": false
     }
   ]

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import useScrollReveal from "../hooks/useScrollReveal";
 
 export default function ExhibitionCard({
     imageSrc,
@@ -11,6 +12,8 @@ export default function ExhibitionCard({
 }) {
     const textOrder = imageOnRight ? 'lg:order-2' : 'lg:order-1';
     const imageOrder = imageOnRight ? 'lg:order-1' : 'lg:order-2';
+
+    useScrollReveal();
 
     return (
         <Link to={link} className="group headline flex flex-col max-w-[82.2vw] mx-auto space-y-[30px] lg:space-y-0 lg:flex-row lg:justify-center lg:items-center lg:gap-[100px] p-4">

@@ -1,17 +1,7 @@
 import exhibitionsData from "../../data/exhibitions.json";
-import { coverUrl } from "../../data/covers";
-import { pageMeta } from "../../lib/meta";
-import ogImage from "../../assets/imgs/ExhibitionBanner.webp?og";
+import { exhibitionImages } from "../../data/imagesObjects";
 import CardLayout from "../../small_component/CardLayout";
 import Breadcrumbs from "../../small_component/Breadcrumbs";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "展覽總覽",
-		description: "「對話的對話」— 青年設計師與創作者的主題展，涵蓋平面、空間、影像與裝置。",
-		image: ogImage,
-		location,
-	});
 
 export default function ExhibitionListPage() {
 	return (
@@ -23,7 +13,7 @@ export default function ExhibitionListPage() {
 					<CardLayout
 						key={exhibition.id}
 						to={`/Plan/ExhibitionList/${exhibition.id}`}
-						image={coverUrl(exhibition.cover)}
+						image={exhibitionImages[exhibition.id]}
 						title={exhibition.title}
 						date={exhibition.date}
 					/>

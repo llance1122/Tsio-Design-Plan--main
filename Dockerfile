@@ -24,10 +24,9 @@ ENV DATA_DIR=/data
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# 後端程式、react-router build 的輸出（瀏覽器端檔案 + 預先產生的頁面 + 伺服器渲染程式）、
-# 以及匯入用的原始文章資料
+# 後端程式、打包後的前端、以及匯入用的原始文章資料
 COPY server ./server
-COPY --from=build /app/build ./build
+COPY --from=build /app/dist ./dist
 COPY src/data ./src/data
 
 EXPOSE 3001

@@ -1,39 +1,34 @@
-import { data } from "react-router";
-import { articleCover } from "../lib/articles";
-import { pageMeta } from "../lib/meta";
-import { url } from "../lib/paths";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { fetchArticle, articleCover } from "../lib/articles";
 import Breadcrumbs from "../small_component/Breadcrumbs";
 
-// 文章內頁：有人瀏覽時由伺服器即時讀資料庫產生 HTML，
-// 後台新發的文章也立刻有完整內容（搜尋引擎、LINE 預覽都讀得到）
-export function loader({ params, context }) {
-	const article = context.articles.get(params.articleId); // 網址上的值是文章 slug
-	// 找不到時回 404 狀態碼，畫面顯示「找不到這篇文章」
-	if (!article) return data({ article: null }, { status: 404 });
-	return { article };
-}
+export default function SingleArticlePage() {
+	const { articleId } = useParams(); // 這裡的值其實是文章 slug
+	const [article, setArticle] = useState(null);
+	const [status, setStatus] = useState("loading"); // loading | notfound | error | ok
 
-export const meta = ({ loaderData, location }) => {
-	const article = loaderData?.article;
-	if (!article) return pageMeta({ title: "找不到文章", location, noindex: true });
-	return pageMeta({
-		title: article.title,
-		description: article.description,
-		// 有上傳海報就用海報，沒有就用網站預設的分享圖
-		image: article.cover ? url(article.cover) : undefined,
-		uncropped: Boolean(article.cover),
-		location,
-	});
-};
+	useEffect(() => {
+		setStatus("loading");
+		fetchArticle(articleId)
+			.then((data) => {
+				setArticle(data);
+				setStatus("ok");
+			})
+			.catch((e) => setStatus(e.message === "notfound" ? "notfound" : "error"));
+	}, [articleId]);
 
-export default function SingleArticlePage({ loaderData }) {
-	const { article } = loaderData;
-
-	if (!article) {
+	if (status !== "ok") {
+		const msg =
+			status === "loading"
+				? "載入中…"
+				: status === "notfound"
+					? "找不到這篇文章。"
+					: "文章載入失敗，請稍後再試。";
 		return (
 			<section className="w-full mx-auto px-[40px] lg:max-w-7xl mt-[15vh] lg:mt-[24vh]">
 				<Breadcrumbs word="Article" />
-				<p className="bodyText lg:bodyText-web text-center mt-[60px]">找不到這篇文章。</p>
+				<p className="bodyText lg:bodyText-web text-center mt-[60px]">{msg}</p>
 			</section>
 		);
 	}

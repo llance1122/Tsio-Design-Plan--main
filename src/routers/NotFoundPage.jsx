@@ -1,12 +1,4 @@
-import { data, NavLink } from "react-router";
-import { pageMeta } from "../lib/meta";
-
-// 回傳 404 狀態碼，搜尋引擎才知道這個網址不存在
-export function loader() {
-	return data(null, { status: 404 });
-}
-
-export const meta = ({ location }) => pageMeta({ title: "找不到頁面", location, noindex: true });
+import { NavLink } from "react-router";
 
 export default function NotFoundPage() {
 	return (

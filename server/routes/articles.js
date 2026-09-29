@@ -12,7 +12,6 @@ import path from "node:path";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import db from "../db.js";
-import { listArticles, findArticle } from "../articles.js";
 import { UPLOAD_DIR } from "../config.js";
 import { requireAuth } from "../auth.js";
 
@@ -84,9 +83,21 @@ function readArticleBody(req) {
 	};
 }
 
+// 讀出單篇，並把 blocks 從 JSON 字串轉回陣列
+function findArticle(column, value) {
+	const row = db.prepare(`SELECT * FROM articles WHERE ${column} = ?`).get(value);
+	if (row) row.blocks = JSON.parse(row.blocks);
+	return row;
+}
+
 // ---- 列表：不回傳內文，減少傳輸量 ----
 router.get("/", (req, res) => {
-	res.json(listArticles());
+	const rows = db
+		.prepare(
+			"SELECT id, slug, title, description, date, location, cover, created_at FROM articles ORDER BY created_at DESC, id DESC"
+		)
+		.all();
+	res.json(rows);
 });
 
 // ---- 單篇：含內文區塊 ----

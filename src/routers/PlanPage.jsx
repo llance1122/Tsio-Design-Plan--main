@@ -4,16 +4,11 @@ import ExhibitionCard from "../small_component/ExhibitionCard";
 
 import Others from "../assets/imgs/Exhibition_1.webp";
 import Exhibition from "../assets/imgs/ExhibitionBanner.webp";
-import { pageMeta } from "../lib/meta";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "計劃",
-		description: "展覽、工作坊、市集、講座與戶外電影 — 設醮的各項活動。",
-		location,
-	});
+import useScrollReveal from "../hooks/useScrollReveal";
 
 export default function PlanPage() {
+	useScrollReveal();
+
 	return (
 		<section className="space-y-[10vh]">
 			<main className="space-y-[10vh] lg:space-y-[20vh] mt-[15vh] lg:mt-[24vh]">

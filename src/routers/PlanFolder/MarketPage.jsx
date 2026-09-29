@@ -4,16 +4,6 @@ import Title from "../../small_component/Title";
 
 import ExhibitionBanner from "../../assets/imgs/ExhibitionBanner.webp";
 import ExhibitionLayout from "../../assets/imgs/ExhibitionLayout.webp";
-import { pageMeta } from "../../lib/meta";
-import ogImage from "../../assets/imgs/ExhibitionBanner.webp?og";
-
-export const meta = ({ location }) =>
-	pageMeta({
-		title: "市集",
-		description: "延伸展覽精神的創意市集，集結手作品牌、獨立出版與插畫小物。",
-		image: ogImage,
-		location,
-	});
 
 // ============================================================
 //  市集分區：每區一個標題 + 兩張圖，要增減分區改這個陣列即可
